@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Star, ShoppingCart, ArrowLeft, Heart, Minus, Plus } from 'lucide-react';
+import { Star, ShoppingCart, ArrowLeft, Heart, Minus, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function ProductDetailsPage() {
   const params = useParams();
@@ -13,6 +13,8 @@ export default function ProductDetailsPage() {
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [productImages, setProductImages] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -30,6 +32,21 @@ export default function ProductDetailsPage() {
       const data = await response.json();
       if (data.success) {
         setProduct(data.product);
+        
+        // Extract images array
+        let images = [];
+        if (data.product.images) {
+          images = typeof data.product.images === 'string' 
+            ? JSON.parse(data.product.images) 
+            : data.product.images;
+        }
+        
+        // Fallback to image_url if no images array
+        if (images.length === 0 && data.product.image_url) {
+          images = [{ url: data.product.image_url, isPrimary: true }];
+        }
+        
+        setProductImages(images);
       }
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -65,6 +82,14 @@ export default function ProductDetailsPage() {
     }
   };
 
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % productImages.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + productImages.length) % productImages.length);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#7DAACB] via-[#E8D5C4] to-[#7DAACB] flex items-center justify-center">
@@ -98,19 +123,79 @@ export default function ProductDetailsPage() {
 
         <div className="grid md:grid-cols-2 gap-8">
           <Card className="overflow-hidden shadow-2xl">
-            <div className="aspect-square bg-gray-100">
-              {product.image_url ? (
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
+            <div className="relative aspect-square bg-gray-100">
+              {productImages.length > 0 ? (
+                <>
+                  <img
+                    src={productImages[currentImageIndex].url}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                  
+                  {productImages.length > 1 && (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white"
+                        onClick={prevImage}
+                      >
+                        <ChevronLeft className="w-6 h-6" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white"
+                        onClick={nextImage}
+                      >
+                        <ChevronRight className="w-6 h-6" />
+                      </Button>
+                      
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                        {productImages.map((_, index) => (
+                          <button
+                            key={index}
+                            className={`w-2 h-2 rounded-full transition-all ${
+                              index === currentImageIndex 
+                                ? 'bg-white w-6' 
+                                : 'bg-white/50 hover:bg-white/75'
+                            }`}
+                            onClick={() => setCurrentImageIndex(index)}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#7DAACB] to-[#E8D5C4]">
                   <Star className="w-32 h-32 text-white/50" />
                 </div>
               )}
             </div>
+            
+            {/* Thumbnail Gallery */}
+            {productImages.length > 1 && (
+              <div className="p-4 grid grid-cols-5 gap-2">
+                {productImages.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                      index === currentImageIndex 
+                        ? 'border-[#7DAACB] scale-105' 
+                        : 'border-gray-200 hover:border-[#7DAACB]/50'
+                    }`}
+                  >
+                    <img
+                      src={img.url}
+                      alt={`View ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </Card>
 
           <div className="space-y-6">

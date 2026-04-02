@@ -556,16 +556,25 @@ export async function POST(request) {
   // POST /api/admin/products - Add product
   if (segments[1] === 'admin' && segments[2] === 'products') {
     try {
-      const { name, price, description, category, imageBase64 } = body;
+      const { name, price, description, category, images } = body; // images is array of base64
       
-      let imageUrl = null;
-      if (imageBase64) {
-        imageUrl = await uploadToCloudinary(imageBase64, 'sn_collections/products');
+      let imageUrls = [];
+      if (images && Array.isArray(images) && images.length > 0) {
+        // Upload all images to Cloudinary
+        for (const imageBase64 of images) {
+          if (imageBase64) {
+            const imageUrl = await uploadToCloudinary(imageBase64, 'sn_collections/products');
+            imageUrls.push({ url: imageUrl, isPrimary: imageUrls.length === 0 });
+          }
+        }
       }
       
+      // Also set first image as image_url for backward compatibility
+      const primaryImageUrl = imageUrls.length > 0 ? imageUrls[0].url : null;
+      
       const result = await query(
-        'INSERT INTO products (name, price, description, category, image_url) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-        [name, parseFloat(price), description, category, imageUrl]
+        'INSERT INTO products (name, price, description, category, image_url, images) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+        [name, parseFloat(price), description, category, primaryImageUrl, JSON.stringify(imageUrls)]
       );
       
       return NextResponse.json({ 
@@ -657,22 +666,27 @@ export async function PUT(request) {
   if (segments[1] === 'admin' && segments[2] === 'products' && segments.length === 4) {
     try {
       const productId = segments[3];
-      const { name, price, description, category, imageBase64 } = body;
+      const { name, price, description, category, images, existingImages } = body;
       
-      let imageUrl = null;
-      if (imageBase64) {
-        imageUrl = await uploadToCloudinary(imageBase64, 'sn_collections/products');
+      let imageUrls = existingImages || [];
+      
+      // Upload new images if provided
+      if (images && Array.isArray(images) && images.length > 0) {
+        for (const imageBase64 of images) {
+          if (imageBase64) {
+            const imageUrl = await uploadToCloudinary(imageBase64, 'sn_collections/products');
+            imageUrls.push({ url: imageUrl, isPrimary: imageUrls.length === 0 });
+          }
+        }
       }
       
-      const updateQuery = imageUrl
-        ? 'UPDATE products SET name = $1, price = $2, description = $3, category = $4, image_url = $5 WHERE id = $6 RETURNING *'
-        : 'UPDATE products SET name = $1, price = $2, description = $3, category = $4 WHERE id = $5 RETURNING *';
+      // Set first image as primary image_url
+      const primaryImageUrl = imageUrls.length > 0 ? imageUrls[0].url : null;
       
-      const params = imageUrl
-        ? [name, parseFloat(price), description, category, imageUrl, productId]
-        : [name, parseFloat(price), description, category, productId];
-      
-      const result = await query(updateQuery, params);
+      const result = await query(
+        'UPDATE products SET name = $1, price = $2, description = $3, category = $4, image_url = $5, images = $6 WHERE id = $7 RETURNING *',
+        [name, parseFloat(price), description, category, primaryImageUrl, JSON.stringify(imageUrls), productId]
+      );
       
       return NextResponse.json({ 
         success: true, 

@@ -35,8 +35,9 @@ export default function AdminDashboard() {
     price: '',
     description: '',
     category: 'Earrings',
-    image: null
+    images: [] // Array of base64 images
   });
+  const [existingImages, setExistingImages] = useState([]); // For edit mode
   const [editingProduct, setEditingProduct] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -90,14 +91,31 @@ export default function AdminDashboard() {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+    const files = Array.from(e.target.files);
+    const newImages = [];
+    
+    let processed = 0;
+    files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProductForm({ ...productForm, image: reader.result });
+        newImages.push(reader.result);
+        processed++;
+        if (processed === files.length) {
+          setProductForm({ ...productForm, images: [...productForm.images, ...newImages] });
+        }
       };
       reader.readAsDataURL(file);
-    }
+    });
+  };
+
+  const removeImage = (index) => {
+    const newImages = productForm.images.filter((_, i) => i !== index);
+    setProductForm({ ...productForm, images: newImages });
+  };
+
+  const removeExistingImage = (index) => {
+    const newExisting = existingImages.filter((_, i) => i !== index);
+    setExistingImages(newExisting);
   };
 
   const handleProductSubmit = async (e) => {
@@ -119,14 +137,16 @@ export default function AdminDashboard() {
           price: parseFloat(productForm.price),
           description: productForm.description,
           category: productForm.category,
-          imageBase64: productForm.image
+          images: productForm.images, // Array of base64 images
+          existingImages: editingProduct ? existingImages : []
         })
       });
 
       const data = await response.json();
       if (data.success) {
         alert(editingProduct ? 'Product updated!' : 'Product added!');
-        setProductForm({ name: '', price: '', description: '', category: 'Earrings', image: null });
+        setProductForm({ name: '', price: '', description: '', category: 'Earrings', images: [] });
+        setExistingImages([]);
         setEditingProduct(null);
         fetchProducts();
       } else {
@@ -157,13 +177,16 @@ export default function AdminDashboard() {
   };
 
   const handleEditProduct = (product) => {
+    const productImages = product.images ? (typeof product.images === 'string' ? JSON.parse(product.images) : product.images) : [];
+    
     setProductForm({
       name: product.name,
       price: product.price,
       description: product.description,
       category: product.category,
-      image: product.image_url
+      images: []
     });
+    setExistingImages(productImages);
     setEditingProduct(product);
     setActiveTab('add-product');
   };
@@ -380,20 +403,70 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="image">Product Image</Label>
+                    <Label htmlFor="image">Product Images (Multiple)</Label>
                     <Input
                       id="image"
                       type="file"
                       accept="image/*"
+                      multiple
                       onChange={handleImageChange}
                     />
-                    {productForm.image && (
-                      <div className="mt-2">
-                        <img
-                          src={productForm.image}
-                          alt="Preview"
-                          className="w-32 h-32 object-cover rounded-lg"
-                        />
+                    <p className="text-sm text-gray-500">You can select multiple images</p>
+                    
+                    {/* Existing Images */}
+                    {existingImages.length > 0 && (
+                      <div className="mt-4">
+                        <Label className="mb-2 block">Current Images:</Label>
+                        <div className="grid grid-cols-4 gap-2">
+                          {existingImages.map((img, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={img.url}
+                                alt={`Existing ${index + 1}`}
+                                className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
+                              />
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="destructive"
+                                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 h-6 w-6"
+                                onClick={() => removeExistingImage(index)}
+                              >
+                                ✕
+                              </Button>
+                              {img.isPrimary && (
+                                <Badge className="absolute bottom-1 left-1 text-xs">Primary</Badge>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* New Images Preview */}
+                    {productForm.images.length > 0 && (
+                      <div className="mt-4">
+                        <Label className="mb-2 block">New Images to Upload:</Label>
+                        <div className="grid grid-cols-4 gap-2">
+                          {productForm.images.map((img, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={img}
+                                alt={`Preview ${index + 1}`}
+                                className="w-full h-24 object-cover rounded-lg border-2 border-green-200"
+                              />
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="destructive"
+                                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 h-6 w-6"
+                                onClick={() => removeImage(index)}
+                              >
+                                ✕
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -413,7 +486,8 @@ export default function AdminDashboard() {
                         variant="outline"
                         onClick={() => {
                           setEditingProduct(null);
-                          setProductForm({ name: '', price: '', description: '', category: 'Earrings', image: null });
+                          setExistingImages([]);
+                          setProductForm({ name: '', price: '', description: '', category: 'Earrings', images: [] });
                         }}
                       >
                         Cancel
