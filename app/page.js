@@ -290,16 +290,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <div className="fixed bottom-4 right-4">
-        <Button
-          variant="outline"
-          className="bg-white/90 hover:bg-white shadow-lg"
-          onClick={() => window.location.href = '/admin/login'}
-        >
-          Admin Login
-        </Button>
-      </div>
-
       <footer className="bg-white mt-12 py-8 border-t">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">

@@ -207,25 +207,108 @@ export async function POST(request) {
     }
   }
   
-  // POST /api/auth/login - User login
+  // POST /api/auth/login - Unified login (auto-detects admin vs user)
   if (segments[1] === 'auth' && segments[2] === 'login') {
     try {
-      const { identifier, password } = body; // identifier can be username or phone
+      const { identifier, password, otpCode } = body; // identifier can be username or phone
       
-      // Find user by username or phone
-      const result = await query(
+      // Check if this is an admin login
+      const adminResult = await query(
+        'SELECT * FROM admin WHERE username = $1',
+        [identifier]
+      );
+      
+      if (adminResult.rows.length > 0) {
+        // This is an admin login
+        const admin = adminResult.rows[0];
+        
+        // Verify admin password
+        if (!comparePassword(password, admin.password)) {
+          return NextResponse.json({ 
+            success: false, 
+            error: 'Invalid credentials' 
+          }, { status: 401 });
+        }
+        
+        // If no OTP provided, send OTP
+        if (!otpCode) {
+          const otp = generateOTP();
+          const expiresAt = new Date(Date.now() + (parseInt(process.env.OTP_EXPIRY_MINUTES || 5) * 60000));
+          
+          // Delete old OTPs
+          await query(
+            'DELETE FROM otp_codes WHERE identifier = $1 AND purpose = $2',
+            [admin.email, 'admin_login']
+          );
+          
+          // Store OTP
+          await query(
+            'INSERT INTO otp_codes (identifier, otp_code, purpose, expires_at) VALUES ($1, $2, $3, $4)',
+            [admin.email, otp, 'admin_login', expiresAt]
+          );
+          
+          // Send OTP email
+          await sendOTPEmail(admin.email, otp, 'admin_login');
+          
+          return NextResponse.json({ 
+            success: true, 
+            requiresOTP: true,
+            message: 'OTP sent to admin email',
+            email: admin.email.replace(/(.{2})(.*)(@.*)/, '$1***$3'),
+            isAdmin: true
+          });
+        } else {
+          // Verify OTP
+          const otpResult = await query(
+            'SELECT * FROM otp_codes WHERE identifier = $1 AND otp_code = $2 AND purpose = $3 AND verified = FALSE AND expires_at > NOW()',
+            [admin.email, otpCode, 'admin_login']
+          );
+          
+          if (otpResult.rows.length === 0) {
+            return NextResponse.json({ 
+              success: false, 
+              error: 'Invalid or expired OTP' 
+            }, { status: 400 });
+          }
+          
+          // Mark OTP as verified
+          await query(
+            'UPDATE otp_codes SET verified = TRUE WHERE id = $1',
+            [otpResult.rows[0].id]
+          );
+          
+          const token = generateToken({ 
+            adminId: admin.id, 
+            username: admin.username,
+            isAdmin: true 
+          });
+          
+          delete admin.password;
+          
+          return NextResponse.json({ 
+            success: true, 
+            message: 'Admin login successful',
+            isAdmin: true,
+            user: admin,
+            token 
+          });
+        }
+      }
+      
+      // Regular user login
+      const userResult = await query(
         'SELECT * FROM users WHERE username = $1 OR phone = $1',
         [identifier]
       );
       
-      if (result.rows.length === 0) {
+      if (userResult.rows.length === 0) {
         return NextResponse.json({ 
           success: false, 
           error: 'Invalid credentials' 
         }, { status: 401 });
       }
       
-      const user = result.rows[0];
+      const user = userResult.rows[0];
       
       // Verify password
       if (!comparePassword(password, user.password)) {
@@ -235,7 +318,7 @@ export async function POST(request) {
         }, { status: 401 });
       }
       
-      const token = generateToken({ userId: user.id, username: user.username });
+      const token = generateToken({ userId: user.id, username: user.username, isAdmin: false });
       
       // Remove password from response
       delete user.password;
@@ -243,6 +326,7 @@ export async function POST(request) {
       return NextResponse.json({ 
         success: true, 
         message: 'Login successful',
+        isAdmin: false,
         user,
         token 
       });
