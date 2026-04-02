@@ -156,6 +156,35 @@ export async function GET(request) {
     }
   }
   
+  // GET /api/migrate-db - Add images column (run once)
+  if (segments[1] === 'migrate-db') {
+    try {
+      // Add images column
+      await query(`
+        ALTER TABLE products 
+        ADD COLUMN IF NOT EXISTS images JSONB DEFAULT '[]'::jsonb
+      `);
+      
+      // Migrate existing image_url to images array
+      await query(`
+        UPDATE products 
+        SET images = jsonb_build_array(
+          jsonb_build_object('url', image_url, 'isPrimary', true)
+        )
+        WHERE image_url IS NOT NULL 
+          AND image_url != '' 
+          AND (images IS NULL OR images = '[]'::jsonb)
+      `);
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Database migrated successfully - images column added' 
+      });
+    } catch (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+  
   return NextResponse.json({ error: 'Not found' }, { status: 404 });
 }
 
