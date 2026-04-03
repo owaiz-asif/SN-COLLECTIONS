@@ -6,13 +6,13 @@ import { Phone, Mail, MapPin, Star } from 'lucide-react';
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2D5F3F] via-[#D4AF37] to-[#2D5F3F]">
+    <div className="min-h-screen bg-gradient-to-br from-[#B87861] via-[#9B6B5F] to-[#B87861]">
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg">
-                <Star className="w-8 h-8 text-[#2D5F3F]" fill="#2D5F3F" />
+                <Star className="w-8 h-8 text-[#B87861]" fill="#B87861" />
               </div>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Contact Us</h1>
@@ -22,7 +22,7 @@ export default function ContactPage() {
           <div className="grid md:grid-cols-2 gap-6">
             <Card className="shadow-2xl">
               <CardHeader>
-                <CardTitle className="flex items-center text-[#2D5F3F]">
+                <CardTitle className="flex items-center text-[#B87861]">
                   <Phone className="w-6 h-6 mr-2" />
                   Phone
                 </CardTitle>
@@ -32,7 +32,7 @@ export default function ContactPage() {
                 <p className="text-gray-600">Monday - Saturday: 10 AM - 8 PM</p>
                 <p className="text-gray-600">Sunday: 10 AM - 6 PM</p>
                 <Button 
-                  className="mt-4 bg-[#2D5F3F] hover:bg-[#5E9B76]"
+                  className="mt-4 bg-[#B87861] hover:bg-[#D4A896]"
                   onClick={() => window.location.href = 'tel:8660109399'}
                 >
                   Call Now
@@ -42,7 +42,7 @@ export default function ContactPage() {
 
             <Card className="shadow-2xl">
               <CardHeader>
-                <CardTitle className="flex items-center text-[#2D5F3F]">
+                <CardTitle className="flex items-center text-[#B87861]">
                   <Mail className="w-6 h-6 mr-2" />
                   Email
                 </CardTitle>
@@ -51,7 +51,7 @@ export default function ContactPage() {
                 <p className="text-lg font-semibold mb-2">sncollections7411@gmail.com</p>
                 <p className="text-gray-600 mb-4">We'll respond within 24 hours</p>
                 <Button 
-                  className="bg-[#2D5F3F] hover:bg-[#5E9B76]"
+                  className="bg-[#B87861] hover:bg-[#D4A896]"
                   onClick={() => window.location.href = 'mailto:sncollections7411@gmail.com'}
                 >
                   Send Email
@@ -62,7 +62,7 @@ export default function ContactPage() {
 
           <Card className="mt-6 shadow-2xl">
             <CardHeader>
-              <CardTitle className="flex items-center text-[#2D5F3F]">
+              <CardTitle className="flex items-center text-[#B87861]">
                 <MapPin className="w-6 h-6 mr-2" />
                 Visit Our Store
               </CardTitle>

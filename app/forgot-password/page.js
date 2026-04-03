@@ -114,16 +114,16 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2D5F3F] via-[#D4AF37] to-[#2D5F3F] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#B87861] via-[#9B6B5F] to-[#B87861] flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-[#2D5F3F] to-[#D4AF37] rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-[#B87861] to-[#9B6B5F] rounded-full flex items-center justify-center">
               <KeyRound className="w-8 h-8 text-white" />
             </div>
           </div>
           <div>
-            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-[#2D5F3F] to-[#5E9B76] bg-clip-text text-transparent">
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-[#B87861] to-[#D4A896] bg-clip-text text-transparent">
               Reset Password
             </CardTitle>
             <CardDescription className="mt-2">
@@ -159,7 +159,7 @@ export default function ForgotPasswordPage() {
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-[#2D5F3F] hover:bg-[#5E9B76] text-lg"
+                className="w-full h-12 bg-[#B87861] hover:bg-[#D4A896] text-lg"
                 disabled={loading}
               >
                 {loading ? 'Sending OTP...' : 'Send OTP'}
@@ -169,7 +169,7 @@ export default function ForgotPasswordPage() {
                 <button
                   type="button"
                   onClick={() => window.location.href = '/login'}
-                  className="text-sm text-[#2D5F3F] hover:underline"
+                  className="text-sm text-[#B87861] hover:underline"
                 >
                   Back to Login
                 </button>
@@ -209,7 +209,7 @@ export default function ForgotPasswordPage() {
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-[#2D5F3F] hover:bg-[#5E9B76] text-lg"
+                className="w-full h-12 bg-[#B87861] hover:bg-[#D4A896] text-lg"
                 disabled={loading}
               >
                 {loading ? 'Verifying...' : 'Verify OTP'}
@@ -264,7 +264,7 @@ export default function ForgotPasswordPage() {
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-[#2D5F3F] hover:bg-[#5E9B76] text-lg"
+                className="w-full h-12 bg-[#B87861] hover:bg-[#D4A896] text-lg"
                 disabled={loading}
               >
                 {loading ? 'Resetting...' : 'Reset Password'}

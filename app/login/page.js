@@ -59,19 +59,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2D5F3F] via-[#D4AF37] to-[#2D5F3F] flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-2xl">
+    <div className="min-h-screen bg-gradient-to-br from-[#F5EFE7] via-[#FAF6F1] to-[#F5EFE7] flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-2xl border-2 border-[#E8DDD0]">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-[#2D5F3F] to-[#D4AF37] rounded-full flex items-center justify-center">
-              <Star className="w-8 h-8 text-white" fill="white" />
-            </div>
+            <img 
+              src="https://customer-assets.emergentagent.com/job_sn-jewelry-shop/artifacts/ry4pjkmk_WhatsApp%20Image%202026-04-03%20at%2019.34.56.jpeg" 
+              alt="SN Collections Logo" 
+              className="w-20 h-20 rounded-full object-cover shadow-xl ring-4 ring-[#B87861]"
+            />
           </div>
           <div>
-            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-[#2D5F3F] to-[#5E9B76] bg-clip-text text-transparent">
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-[#B87861] via-[#9B6B5F] to-[#B87861] bg-clip-text text-transparent">
               SN COLLECTIONS
             </CardTitle>
-            <CardDescription className="mt-2">Welcome back! Please login to continue</CardDescription>
+            <CardDescription className="mt-2 text-[#9B6B5F]">Welcome back! Please login to continue</CardDescription>
           </div>
         </CardHeader>
         <CardContent>
@@ -136,7 +138,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full h-12 bg-[#2D5F3F] hover:bg-[#5E9B76] text-lg"
+              className="w-full h-12 bg-[#B87861] hover:bg-[#9B6B5F] text-lg text-white shadow-md"
               disabled={loading}
             >
               {loading ? 'Please wait...' : requiresOTP ? 'Verify OTP' : 'Login'}
@@ -148,7 +150,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => window.location.href = '/forgot-password'}
-                  className="text-sm text-[#2D5F3F] hover:underline"
+                  className="text-sm text-[#B87861] hover:underline"
                 >
                   Forgot Password?
                 </button>
@@ -157,7 +159,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => window.location.href = '/register'}
-                    className="text-[#2D5F3F] font-semibold hover:underline"
+                    className="text-[#B87861] font-semibold hover:underline"
                   >
                     Register here
                   </button>

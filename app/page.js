@@ -83,19 +83,21 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F9E4B7] via-white to-[#F5E6D3]">
-      <header className="bg-white shadow-lg sticky top-0 z-50 border-b-2 border-[#D4AF37]">
+    <div className="min-h-screen bg-gradient-to-br from-[#FAF6F1] via-white to-[#F5EFE7]">
+      <header className="bg-white shadow-lg sticky top-0 z-50 border-b-2 border-[#9B6B5F]">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#2D5F3F] to-[#D4AF37] rounded-full flex items-center justify-center shadow-md">
-                <Star className="w-6 h-6 text-white" fill="white" />
-              </div>
+            <div className="flex items-center space-x-3">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_sn-jewelry-shop/artifacts/ry4pjkmk_WhatsApp%20Image%202026-04-03%20at%2019.34.56.jpeg" 
+                alt="SN Collections Logo" 
+                className="w-14 h-14 rounded-full object-cover shadow-lg ring-2 ring-[#B87861]"
+              />
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#2D5F3F] via-[#D4AF37] to-[#2D5F3F] bg-clip-text text-transparent">
+                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#B87861] via-[#9B6B5F] to-[#B87861] bg-clip-text text-transparent">
                   SN COLLECTIONS
                 </h1>
-                <p className="text-xs text-[#7B9FB8]">Premium Jewelry Collection</p>
+                <p className="text-xs text-[#C4A18A] font-medium">Premium Jewelry Collection</p>
               </div>
             </div>
 
@@ -114,7 +116,7 @@ export default function LandingPage() {
                     Contact
                   </Button>
                   <div className="flex items-center space-x-2">
-                    <User className="w-5 h-5 text-[#2D5F3F]" />
+                    <User className="w-5 h-5 text-[#B87861]" />
                     <span className="text-sm font-medium">{user.name}</span>
                   </div>
                   <Button variant="outline" onClick={handleLogout}>
@@ -130,7 +132,7 @@ export default function LandingPage() {
                   <Button variant="outline" onClick={() => window.location.href = '/login'}>
                     Login
                   </Button>
-                  <Button className="bg-[#D4AF37] hover:bg-[#B8941F] text-white shadow-md" onClick={() => window.location.href = '/register'}>
+                  <Button className="bg-[#B87861] hover:bg-[#9B6B5F] text-white shadow-md font-semibold" onClick={() => window.location.href = '/register'}>
                     Register
                   </Button>
                 </>
@@ -173,7 +175,7 @@ export default function LandingPage() {
                   <Button variant="outline" className="w-full" onClick={() => window.location.href = '/login'}>
                     Login
                   </Button>
-                  <Button className="w-full bg-[#2D5F3F] hover:bg-[#5E9B76]" onClick={() => window.location.href = '/register'}>
+                  <Button className="w-full bg-[#B87861] hover:bg-[#D4A896]" onClick={() => window.location.href = '/register'}>
                     Register
                   </Button>
                 </>
@@ -183,17 +185,17 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <section className="py-12 md:py-20 text-center bg-gradient-to-r from-[#B0D4E8] via-[#F9E4B7] to-[#F5E6D3]">
+      <section className="py-12 md:py-20 text-center bg-gradient-to-r from-[#F5EFE7] via-[#FAF6F1] to-[#F5EFE7]">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl md:text-6xl font-bold text-[#2D5F3F] mb-4 drop-shadow-md">
+          <h2 className="text-4xl md:text-6xl font-bold text-[#B87861] mb-4 drop-shadow-md">
             Discover Timeless Elegance
           </h2>
-          <p className="text-xl md:text-2xl text-[#7B9FB8] mb-8 font-medium">
+          <p className="text-xl md:text-2xl text-[#9B6B5F] mb-8 font-medium">
             Handcrafted Jewelry for Every Occasion
           </p>
           
-          <div className="max-w-2xl mx-auto bg-white rounded-full shadow-2xl p-2 flex items-center border-2 border-[#D4AF37]">
-            <Search className="w-5 h-5 ml-3 text-[#7B9FB8]" />
+          <div className="max-w-2xl mx-auto bg-white rounded-full shadow-2xl p-2 flex items-center border-2 border-[#B87861]">
+            <Search className="w-5 h-5 ml-3 text-[#C4A18A]" />
             <Input
               type="text"
               placeholder="Search for jewelry..."
@@ -201,14 +203,14 @@ export default function LandingPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Button className="bg-[#D4AF37] hover:bg-[#B8941F] rounded-full text-white font-semibold">
+            <Button className="bg-[#B87861] hover:bg-[#9B6B5F] rounded-full text-white font-semibold shadow-md">
               Search
             </Button>
           </div>
         </div>
       </section>
 
-      <section className="py-8 bg-[#F5E6D3]">
+      <section className="py-8 bg-gradient-to-r from-[#F5EFE7] to-[#FAF6F1]">
         <div className="container mx-auto px-4">
           <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
             {dynamicCategories.map((category) => (
@@ -217,8 +219,8 @@ export default function LandingPage() {
                 variant={selectedCategory === category ? "default" : "outline"}
                 className={`whitespace-nowrap font-semibold ${
                   selectedCategory === category
-                    ? 'bg-[#2D5F3F] text-white hover:bg-[#5E9B76] shadow-md'
-                    : 'bg-white text-[#7B9FB8] border-2 border-[#C9B8A0] hover:border-[#D4AF37] hover:text-[#2D5F3F]'
+                    ? 'bg-[#B87861] text-white hover:bg-[#9B6B5F] shadow-md'
+                    : 'bg-white text-[#9B6B5F] border-2 border-[#E8DDD0] hover:border-[#B87861] hover:text-[#B87861]'
                 }`}
                 onClick={() => setSelectedCategory(category)}
               >
@@ -254,14 +256,14 @@ export default function LandingPage() {
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2D5F3F] to-[#D4AF37]">
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#B87861] to-[#9B6B5F]">
                         <Star className="w-16 h-16 text-white/50" />
                       </div>
                     )}
                     <button className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Heart className="w-5 h-5 text-[#2D5F3F]" />
+                      <Heart className="w-5 h-5 text-[#B87861]" />
                     </button>
-                    <Badge className="absolute bottom-3 left-3 bg-[#5E9B76] text-white shadow-md">
+                    <Badge className="absolute bottom-3 left-3 bg-[#D4A896] text-white shadow-md">
                       {product.category}
                     </Badge>
                   </div>
@@ -271,13 +273,13 @@ export default function LandingPage() {
                       {product.description || 'Beautiful handcrafted jewelry piece'}
                     </p>
                     <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-[#D4AF37]">
+                      <span className="text-2xl font-bold text-[#B87861]">
                         ₹{parseFloat(product.price).toLocaleString('en-IN')}
                       </span>
                       {user && (
                         <Button 
                           size="sm" 
-                          className="bg-[#2D5F3F] hover:bg-[#5E9B76] text-white"
+                          className="bg-[#B87861] hover:bg-[#9B6B5F] text-white shadow-md"
                           onClick={(e) => {
                             e.stopPropagation();
                             alert('Added to cart!');
@@ -296,20 +298,22 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="bg-[#2D5F3F] mt-12 py-8 border-t-4 border-[#D4AF37]">
+      <footer className="bg-[#B87861] mt-12 py-8 border-t-4 border-[#9B6B5F]">
         <div className="container mx-auto px-4 text-center">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#D4AF37] to-[#B8941F] rounded-full flex items-center justify-center shadow-lg">
-              <Star className="w-4 h-4 text-white" fill="white" />
-            </div>
-            <h3 className="text-xl font-bold text-[#D4AF37]">SN COLLECTIONS</h3>
+          <div className="flex items-center justify-center space-x-3 mb-4">
+            <img 
+              src="https://customer-assets.emergentagent.com/job_sn-jewelry-shop/artifacts/ry4pjkmk_WhatsApp%20Image%202026-04-03%20at%2019.34.56.jpeg" 
+              alt="SN Collections Logo" 
+              className="w-12 h-12 rounded-full object-cover shadow-lg ring-2 ring-white"
+            />
+            <h3 className="text-2xl font-bold text-white">SN COLLECTIONS</h3>
           </div>
-          <p className="text-[#F9E4B7] mb-2 font-medium">Premium Jewelry Collection</p>
-          <div className="flex items-center justify-center space-x-2 text-[#B0D4E8] mb-4">
+          <p className="text-[#FAF6F1] mb-2 font-medium">Premium Jewelry Collection</p>
+          <div className="flex items-center justify-center space-x-2 text-white mb-4">
             <Phone className="w-4 h-4" />
             <span className="font-semibold">8660109399</span>
           </div>
-          <p className="text-sm text-[#C9B8A0]">© 2025 SN COLLECTIONS. All rights reserved.</p>
+          <p className="text-sm text-[#E8DDD0]">© 2025 SN COLLECTIONS. All rights reserved.</p>
         </div>
       </footer>
     </div>

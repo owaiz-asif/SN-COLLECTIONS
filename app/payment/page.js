@@ -100,7 +100,7 @@ export default function PaymentPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#2D5F3F] via-[#D4AF37] to-[#2D5F3F] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#B87861] via-[#9B6B5F] to-[#B87861] flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
       </div>
     );
@@ -108,7 +108,7 @@ export default function PaymentPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#2D5F3F] via-[#D4AF37] to-[#2D5F3F] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-[#B87861] via-[#9B6B5F] to-[#B87861] flex items-center justify-center p-4">
         <Card className="w-full max-w-md shadow-2xl">
           <CardContent className="pt-6 text-center space-y-4">
             <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto">
@@ -127,7 +127,7 @@ export default function PaymentPage() {
   const finalAmount = subtotal + gst;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2D5F3F] via-[#D4AF37] to-[#2D5F3F]">
+    <div className="min-h-screen bg-gradient-to-br from-[#B87861] via-[#9B6B5F] to-[#B87861]">
       <div className="container mx-auto px-4 py-8">
         <Button
           variant="outline"
@@ -144,7 +144,7 @@ export default function PaymentPage() {
               <CardTitle className="text-2xl">Payment Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="bg-gradient-to-br from-[#2D5F3F] to-[#D4AF37] p-6 rounded-lg text-white text-center">
+              <div className="bg-gradient-to-br from-[#B87861] to-[#9B6B5F] p-6 rounded-lg text-white text-center">
                 <p className="mb-4">Scan QR Code to Pay</p>
                 <div className="bg-white p-4 rounded-lg inline-block">
                   <img
@@ -181,7 +181,7 @@ export default function PaymentPage() {
 
                 <Button
                   type="submit"
-                  className="w-full h-12 bg-[#2D5F3F] hover:bg-[#5E9B76] text-lg"
+                  className="w-full h-12 bg-[#B87861] hover:bg-[#D4A896] text-lg"
                   disabled={processing}
                 >
                   {processing ? 'Processing...' : 'Confirm Order'}
@@ -219,7 +219,7 @@ export default function PaymentPage() {
                 </div>
                 <div className="border-t pt-2 flex justify-between text-2xl font-bold">
                   <span>Total Amount:</span>
-                  <span className="text-[#2D5F3F]">₹{finalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                  <span className="text-[#B87861]">₹{finalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                 </div>
               </div>
 

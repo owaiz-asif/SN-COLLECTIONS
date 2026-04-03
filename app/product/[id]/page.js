@@ -92,7 +92,7 @@ export default function ProductDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#2D5F3F] via-[#D4AF37] to-[#2D5F3F] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#B87861] via-[#9B6B5F] to-[#B87861] flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
       </div>
     );
@@ -100,7 +100,7 @@ export default function ProductDetailsPage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#2D5F3F] via-[#D4AF37] to-[#2D5F3F] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#B87861] via-[#9B6B5F] to-[#B87861] flex items-center justify-center">
         <Card className="p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">Product Not Found</h2>
           <Button onClick={() => window.location.href = '/'}>Back to Home</Button>
@@ -110,7 +110,7 @@ export default function ProductDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2D5F3F] via-[#D4AF37] to-[#2D5F3F]">
+    <div className="min-h-screen bg-gradient-to-br from-[#B87861] via-[#9B6B5F] to-[#B87861]">
       <div className="container mx-auto px-4 py-8">
         <Button
           variant="outline"
@@ -168,7 +168,7 @@ export default function ProductDetailsPage() {
                   )}
                 </>
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2D5F3F] to-[#D4AF37]">
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#B87861] to-[#9B6B5F]">
                   <Star className="w-32 h-32 text-white/50" />
                 </div>
               )}
@@ -183,8 +183,8 @@ export default function ProductDetailsPage() {
                     onClick={() => setCurrentImageIndex(index)}
                     className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                       index === currentImageIndex 
-                        ? 'border-[#2D5F3F] scale-105' 
-                        : 'border-gray-200 hover:border-[#2D5F3F]/50'
+                        ? 'border-[#B87861] scale-105' 
+                        : 'border-gray-200 hover:border-[#B87861]/50'
                     }`}
                   >
                     <img
@@ -200,12 +200,12 @@ export default function ProductDetailsPage() {
 
           <div className="space-y-6">
             <Card className="p-6 shadow-2xl">
-              <Badge className="mb-4 bg-[#2D5F3F]">{product.category}</Badge>
-              <h1 className="text-4xl font-bold text-[#2D5F3F] mb-4">{product.name}</h1>
+              <Badge className="mb-4 bg-[#B87861]">{product.category}</Badge>
+              <h1 className="text-4xl font-bold text-[#B87861] mb-4">{product.name}</h1>
               <p className="text-gray-600 mb-6 text-lg leading-relaxed">
                 {product.description || 'Beautiful handcrafted jewelry piece from SN Collections'}
               </p>
-              <div className="text-4xl font-bold text-[#2D5F3F] mb-6">
+              <div className="text-4xl font-bold text-[#B87861] mb-6">
                 ₹{parseFloat(product.price).toLocaleString('en-IN')}
               </div>
 
@@ -233,7 +233,7 @@ export default function ProductDetailsPage() {
                   </div>
 
                   <Button
-                    className="w-full h-14 bg-[#2D5F3F] hover:bg-[#5E9B76] text-lg"
+                    className="w-full h-14 bg-[#B87861] hover:bg-[#D4A896] text-lg"
                     onClick={handleAddToCart}
                   >
                     <ShoppingCart className="w-5 h-5 mr-2" />
@@ -251,7 +251,7 @@ export default function ProductDetailsPage() {
                 <div className="space-y-2">
                   <p className="text-gray-600 text-center">Please login to add to cart</p>
                   <Button
-                    className="w-full h-14 bg-[#2D5F3F] hover:bg-[#5E9B76] text-lg"
+                    className="w-full h-14 bg-[#B87861] hover:bg-[#D4A896] text-lg"
                     onClick={() => window.location.href = '/login'}
                   >
                     Login to Buy
