@@ -117,18 +117,46 @@ export default function AdminDashboard() {
     const files = Array.from(e.target.files);
     const newImages = [];
     
-    let processed = 0;
+    // Validate files
+    const maxSize = 10 * 1024 * 1024; // 10MB per file
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml', 'image/heic', 'image/heif', 'image/tiff'];
+    
+    let invalidFiles = [];
+    let oversizedFiles = [];
+    
     files.forEach((file) => {
+      // Check file size
+      if (file.size > maxSize) {
+        oversizedFiles.push(file.name);
+        return;
+      }
+      
+      // Check file type (allow all image types)
+      if (!file.type.startsWith('image/')) {
+        invalidFiles.push(file.name);
+        return;
+      }
+      
       const reader = new FileReader();
       reader.onloadend = () => {
         newImages.push(reader.result);
-        processed++;
-        if (processed === files.length) {
+        if (newImages.length === files.length - invalidFiles.length - oversizedFiles.length) {
           setProductForm({ ...productForm, images: [...productForm.images, ...newImages] });
         }
       };
+      reader.onerror = () => {
+        alert(`Failed to read file: ${file.name}`);
+      };
       reader.readAsDataURL(file);
     });
+    
+    // Show validation errors
+    if (invalidFiles.length > 0) {
+      alert(`Invalid file type(s): ${invalidFiles.join(', ')}\n\nPlease upload image files only.`);
+    }
+    if (oversizedFiles.length > 0) {
+      alert(`File(s) too large (max 10MB): ${oversizedFiles.join(', ')}`);
+    }
   };
 
   const removeImage = (index) => {
@@ -498,11 +526,14 @@ export default function AdminDashboard() {
                     <Input
                       id="image"
                       type="file"
-                      accept="image/*"
+                      accept="image/*,.jpg,.jpeg,.png,.gif,.webp,.bmp,.svg,.heic,.heif,.tiff,.tif,.ico"
                       multiple
                       onChange={handleImageChange}
                     />
-                    <p className="text-sm text-gray-500">You can select multiple images</p>
+                    <p className="text-sm text-gray-500">
+                      Supported formats: JPG, JPEG, PNG, WEBP, GIF, BMP, HEIC, HEIF, TIFF, SVG (all image types)
+                    </p>
+                    <p className="text-sm text-gray-500">You can select multiple images at once</p>
                     
                     {/* Existing Images */}
                     {existingImages.length > 0 && (
