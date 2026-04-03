@@ -62,14 +62,14 @@ export default function OrdersPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#7DAACB] via-[#E8D5C4] to-[#7DAACB] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#4A7C59] via-[#9BC1A3] to-[#4A7C59] flex items-center justify-center">
         <div className="text-white text-xl">Loading orders...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#7DAACB] via-[#E8D5C4] to-[#7DAACB]">
+    <div className="min-h-screen bg-gradient-to-br from-[#4A7C59] via-[#9BC1A3] to-[#4A7C59]">
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <Button
@@ -89,7 +89,7 @@ export default function OrdersPage() {
             <h2 className="text-2xl font-bold mb-2">No orders yet</h2>
             <p className="text-gray-600 mb-6">Start shopping to see your orders here!</p>
             <Button
-              className="bg-[#7DAACB] hover:bg-[#6B8CAD]"
+              className="bg-[#4A7C59] hover:bg-[#3A6047]"
               onClick={() => window.location.href = '/'}
             >
               Browse Products
@@ -101,7 +101,7 @@ export default function OrdersPage() {
               const products = typeof order.products === 'string' ? JSON.parse(order.products) : order.products;
               return (
                 <Card key={order.id} className="shadow-2xl">
-                  <CardHeader className="bg-gradient-to-r from-[#7DAACB]/10 to-[#E8D5C4]/10">
+                  <CardHeader className="bg-gradient-to-r from-[#4A7C59]/10 to-[#9BC1A3]/10">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div>
                         <CardTitle className="text-xl mb-2">Order #{order.id.slice(0, 8)}</CardTitle>
@@ -133,7 +133,7 @@ export default function OrdersPage() {
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#7DAACB] to-[#E8D5C4]">
+                              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#4A7C59] to-[#9BC1A3]">
                                 <Star className="w-8 h-8 text-white/50" />
                               </div>
                             )}
@@ -141,7 +141,7 @@ export default function OrdersPage() {
                           <div className="flex-1">
                             <h4 className="font-semibold">{product.name}</h4>
                             <p className="text-gray-600 text-sm">Quantity: {product.quantity}</p>
-                            <p className="font-semibold text-[#7DAACB]">
+                            <p className="font-semibold text-[#4A7C59]">
                               ₹{parseFloat(product.price).toLocaleString('en-IN')}
                             </p>
                           </div>
@@ -160,7 +160,7 @@ export default function OrdersPage() {
                       </div>
                       <div className="flex justify-between text-xl font-bold pt-2 border-t">
                         <span>Total Amount:</span>
-                        <span className="text-[#7DAACB]">₹{parseFloat(order.final_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                        <span className="text-[#4A7C59]">₹{parseFloat(order.final_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                       </div>
                       {order.transaction_id && (
                         <div className="flex justify-between text-sm text-gray-600 pt-2">

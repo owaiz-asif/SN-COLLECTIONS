@@ -334,20 +334,20 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#7DAACB] via-[#E8D5C4] to-[#7DAACB] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#4A7C59] via-[#9BC1A3] to-[#4A7C59] flex items-center justify-center">
         <div className="text-white text-xl">Loading dashboard...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#7DAACB] via-[#E8D5C4] to-[#7DAACB]">
+    <div className="min-h-screen bg-gradient-to-br from-[#4A7C59] via-[#9BC1A3] to-[#4A7C59]">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-              <Star className="w-6 h-6 text-[#7DAACB]" fill="#7DAACB" />
+              <Star className="w-6 h-6 text-[#4A7C59]" fill="#4A7C59" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
@@ -367,9 +367,9 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-600 text-sm">Total Products</p>
-                  <p className="text-3xl font-bold text-[#7DAACB]">{products.length}</p>
+                  <p className="text-3xl font-bold text-[#4A7C59]">{products.length}</p>
                 </div>
-                <ShoppingBag className="w-12 h-12 text-[#7DAACB]/20" />
+                <ShoppingBag className="w-12 h-12 text-[#4A7C59]/20" />
               </div>
             </CardContent>
           </Card>
@@ -378,9 +378,9 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-600 text-sm">Total Orders</p>
-                  <p className="text-3xl font-bold text-[#7DAACB]">{orders.length}</p>
+                  <p className="text-3xl font-bold text-[#4A7C59]">{orders.length}</p>
                 </div>
-                <Package className="w-12 h-12 text-[#7DAACB]/20" />
+                <Package className="w-12 h-12 text-[#4A7C59]/20" />
               </div>
             </CardContent>
           </Card>
@@ -426,7 +426,7 @@ export default function AdminDashboard() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#7DAACB] to-[#E8D5C4]">
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#4A7C59] to-[#9BC1A3]">
                             <Star className="w-12 h-12 text-white/50" />
                           </div>
                         )}
@@ -434,7 +434,7 @@ export default function AdminDashboard() {
                       <CardContent className="pt-4">
                         <h3 className="font-semibold mb-2">{product.name}</h3>
                         <Badge className="mb-2">{product.category}</Badge>
-                        <p className="text-xl font-bold text-[#7DAACB] mb-4">
+                        <p className="text-xl font-bold text-[#4A7C59] mb-4">
                           ₹{parseFloat(product.price).toLocaleString('en-IN')}
                         </p>
                         <div className="flex gap-2">
@@ -596,7 +596,7 @@ export default function AdminDashboard() {
                   <div className="flex gap-2">
                     <Button
                       type="submit"
-                      className="bg-[#7DAACB] hover:bg-[#6B8CAD]"
+                      className="bg-[#4A7C59] hover:bg-[#3A6047]"
                       disabled={uploadingImage}
                     >
                       <Upload className="w-4 h-4 mr-2" />
@@ -639,7 +639,7 @@ export default function AdminDashboard() {
                     />
                     <Button
                       type="submit"
-                      className="bg-[#7DAACB] hover:bg-[#6B8CAD]"
+                      className="bg-[#4A7C59] hover:bg-[#3A6047]"
                       disabled={categoryLoading}
                     >
                       {categoryLoading ? 'Adding...' : 'Add Category'}
@@ -782,7 +782,7 @@ export default function AdminDashboard() {
                           <div className="border-t pt-3 space-y-1">
                             <div className="flex justify-between font-bold text-lg">
                               <span>Total Amount:</span>
-                              <span className="text-[#7DAACB]">₹{parseFloat(order.final_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                              <span className="text-[#4A7C59]">₹{parseFloat(order.final_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                             </div>
                             {order.transaction_id && (
                               <div className="flex justify-between text-sm text-gray-600">

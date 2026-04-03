@@ -83,16 +83,16 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#7DAACB] via-[#E8D5C4] to-[#7DAACB]">
+    <div className="min-h-screen bg-gradient-to-br from-[#4A7C59] via-[#9BC1A3] to-[#4A7C59]">
       <header className="bg-white shadow-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#7DAACB] to-[#E8D5C4] rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#4A7C59] to-[#9BC1A3] rounded-full flex items-center justify-center">
                 <Star className="w-6 h-6 text-white" fill="white" />
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#7DAACB] to-[#6B8CAD] bg-clip-text text-transparent">
+                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#4A7C59] to-[#3A6047] bg-clip-text text-transparent">
                   SN COLLECTIONS
                 </h1>
                 <p className="text-xs text-gray-500">Premium Jewelry Collection</p>
@@ -114,7 +114,7 @@ export default function LandingPage() {
                     Contact
                   </Button>
                   <div className="flex items-center space-x-2">
-                    <User className="w-5 h-5 text-[#7DAACB]" />
+                    <User className="w-5 h-5 text-[#4A7C59]" />
                     <span className="text-sm font-medium">{user.name}</span>
                   </div>
                   <Button variant="outline" onClick={handleLogout}>
@@ -130,7 +130,7 @@ export default function LandingPage() {
                   <Button variant="outline" onClick={() => window.location.href = '/login'}>
                     Login
                   </Button>
-                  <Button className="bg-[#7DAACB] hover:bg-[#6B8CAD]" onClick={() => window.location.href = '/register'}>
+                  <Button className="bg-[#4A7C59] hover:bg-[#3A6047]" onClick={() => window.location.href = '/register'}>
                     Register
                   </Button>
                 </>
@@ -173,7 +173,7 @@ export default function LandingPage() {
                   <Button variant="outline" className="w-full" onClick={() => window.location.href = '/login'}>
                     Login
                   </Button>
-                  <Button className="w-full bg-[#7DAACB] hover:bg-[#6B8CAD]" onClick={() => window.location.href = '/register'}>
+                  <Button className="w-full bg-[#4A7C59] hover:bg-[#3A6047]" onClick={() => window.location.href = '/register'}>
                     Register
                   </Button>
                 </>
@@ -201,7 +201,7 @@ export default function LandingPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Button className="bg-[#7DAACB] hover:bg-[#6B8CAD] rounded-full">
+            <Button className="bg-[#4A7C59] hover:bg-[#3A6047] rounded-full">
               Search
             </Button>
           </div>
@@ -217,7 +217,7 @@ export default function LandingPage() {
                 variant={selectedCategory === category ? "default" : "outline"}
                 className={`whitespace-nowrap ${
                   selectedCategory === category
-                    ? 'bg-white text-[#7DAACB] hover:bg-white/90'
+                    ? 'bg-white text-[#4A7C59] hover:bg-white/90'
                     : 'bg-white/80 hover:bg-white'
                 }`}
                 onClick={() => setSelectedCategory(category)}
@@ -254,14 +254,14 @@ export default function LandingPage() {
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#7DAACB] to-[#E8D5C4]">
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#4A7C59] to-[#9BC1A3]">
                         <Star className="w-16 h-16 text-white/50" />
                       </div>
                     )}
                     <button className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Heart className="w-5 h-5 text-[#7DAACB]" />
+                      <Heart className="w-5 h-5 text-[#4A7C59]" />
                     </button>
-                    <Badge className="absolute bottom-3 left-3 bg-white text-[#7DAACB]">
+                    <Badge className="absolute bottom-3 left-3 bg-white text-[#4A7C59]">
                       {product.category}
                     </Badge>
                   </div>
@@ -271,13 +271,13 @@ export default function LandingPage() {
                       {product.description || 'Beautiful handcrafted jewelry piece'}
                     </p>
                     <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-[#7DAACB]">
+                      <span className="text-2xl font-bold text-[#4A7C59]">
                         ₹{parseFloat(product.price).toLocaleString('en-IN')}
                       </span>
                       {user && (
                         <Button 
                           size="sm" 
-                          className="bg-[#7DAACB] hover:bg-[#6B8CAD]"
+                          className="bg-[#4A7C59] hover:bg-[#3A6047]"
                           onClick={(e) => {
                             e.stopPropagation();
                             alert('Added to cart!');
@@ -299,10 +299,10 @@ export default function LandingPage() {
       <footer className="bg-white mt-12 py-8 border-t">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#7DAACB] to-[#E8D5C4] rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-[#4A7C59] to-[#9BC1A3] rounded-full flex items-center justify-center">
               <Star className="w-4 h-4 text-white" fill="white" />
             </div>
-            <h3 className="text-xl font-bold text-[#7DAACB]">SN COLLECTIONS</h3>
+            <h3 className="text-xl font-bold text-[#4A7C59]">SN COLLECTIONS</h3>
           </div>
           <p className="text-gray-600 mb-2">Premium Jewelry Collection</p>
           <div className="flex items-center justify-center space-x-2 text-gray-600 mb-4">
