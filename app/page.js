@@ -83,19 +83,19 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#4A7C59] via-[#9BC1A3] to-[#4A7C59]">
-      <header className="bg-white shadow-lg sticky top-0 z-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#F9E4B7] via-white to-[#F5E6D3]">
+      <header className="bg-white shadow-lg sticky top-0 z-50 border-b-2 border-[#D4AF37]">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#4A7C59] to-[#9BC1A3] rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#2D5F3F] to-[#D4AF37] rounded-full flex items-center justify-center shadow-md">
                 <Star className="w-6 h-6 text-white" fill="white" />
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#4A7C59] to-[#3A6047] bg-clip-text text-transparent">
+                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#2D5F3F] via-[#D4AF37] to-[#2D5F3F] bg-clip-text text-transparent">
                   SN COLLECTIONS
                 </h1>
-                <p className="text-xs text-gray-500">Premium Jewelry Collection</p>
+                <p className="text-xs text-[#7B9FB8]">Premium Jewelry Collection</p>
               </div>
             </div>
 
@@ -114,7 +114,7 @@ export default function LandingPage() {
                     Contact
                   </Button>
                   <div className="flex items-center space-x-2">
-                    <User className="w-5 h-5 text-[#4A7C59]" />
+                    <User className="w-5 h-5 text-[#2D5F3F]" />
                     <span className="text-sm font-medium">{user.name}</span>
                   </div>
                   <Button variant="outline" onClick={handleLogout}>
@@ -130,7 +130,7 @@ export default function LandingPage() {
                   <Button variant="outline" onClick={() => window.location.href = '/login'}>
                     Login
                   </Button>
-                  <Button className="bg-[#4A7C59] hover:bg-[#3A6047]" onClick={() => window.location.href = '/register'}>
+                  <Button className="bg-[#D4AF37] hover:bg-[#B8941F] text-white shadow-md" onClick={() => window.location.href = '/register'}>
                     Register
                   </Button>
                 </>
@@ -173,7 +173,7 @@ export default function LandingPage() {
                   <Button variant="outline" className="w-full" onClick={() => window.location.href = '/login'}>
                     Login
                   </Button>
-                  <Button className="w-full bg-[#4A7C59] hover:bg-[#3A6047]" onClick={() => window.location.href = '/register'}>
+                  <Button className="w-full bg-[#2D5F3F] hover:bg-[#5E9B76]" onClick={() => window.location.href = '/register'}>
                     Register
                   </Button>
                 </>
@@ -183,17 +183,17 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <section className="py-12 md:py-20 text-center">
+      <section className="py-12 md:py-20 text-center bg-gradient-to-r from-[#B0D4E8] via-[#F9E4B7] to-[#F5E6D3]">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
+          <h2 className="text-4xl md:text-6xl font-bold text-[#2D5F3F] mb-4 drop-shadow-md">
             Discover Timeless Elegance
           </h2>
-          <p className="text-xl md:text-2xl text-white/90 mb-8">
+          <p className="text-xl md:text-2xl text-[#7B9FB8] mb-8 font-medium">
             Handcrafted Jewelry for Every Occasion
           </p>
           
-          <div className="max-w-2xl mx-auto bg-white rounded-full shadow-2xl p-2 flex items-center">
-            <Search className="w-5 h-5 ml-3 text-gray-400" />
+          <div className="max-w-2xl mx-auto bg-white rounded-full shadow-2xl p-2 flex items-center border-2 border-[#D4AF37]">
+            <Search className="w-5 h-5 ml-3 text-[#7B9FB8]" />
             <Input
               type="text"
               placeholder="Search for jewelry..."
@@ -201,24 +201,24 @@ export default function LandingPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Button className="bg-[#4A7C59] hover:bg-[#3A6047] rounded-full">
+            <Button className="bg-[#D4AF37] hover:bg-[#B8941F] rounded-full text-white font-semibold">
               Search
             </Button>
           </div>
         </div>
       </section>
 
-      <section className="py-8">
+      <section className="py-8 bg-[#F5E6D3]">
         <div className="container mx-auto px-4">
           <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
             {dynamicCategories.map((category) => (
               <Button
                 key={category}
                 variant={selectedCategory === category ? "default" : "outline"}
-                className={`whitespace-nowrap ${
+                className={`whitespace-nowrap font-semibold ${
                   selectedCategory === category
-                    ? 'bg-white text-[#4A7C59] hover:bg-white/90'
-                    : 'bg-white/80 hover:bg-white'
+                    ? 'bg-[#2D5F3F] text-white hover:bg-[#5E9B76] shadow-md'
+                    : 'bg-white text-[#7B9FB8] border-2 border-[#C9B8A0] hover:border-[#D4AF37] hover:text-[#2D5F3F]'
                 }`}
                 onClick={() => setSelectedCategory(category)}
               >
@@ -254,14 +254,14 @@ export default function LandingPage() {
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#4A7C59] to-[#9BC1A3]">
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2D5F3F] to-[#D4AF37]">
                         <Star className="w-16 h-16 text-white/50" />
                       </div>
                     )}
                     <button className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Heart className="w-5 h-5 text-[#4A7C59]" />
+                      <Heart className="w-5 h-5 text-[#2D5F3F]" />
                     </button>
-                    <Badge className="absolute bottom-3 left-3 bg-white text-[#4A7C59]">
+                    <Badge className="absolute bottom-3 left-3 bg-[#5E9B76] text-white shadow-md">
                       {product.category}
                     </Badge>
                   </div>
@@ -271,13 +271,13 @@ export default function LandingPage() {
                       {product.description || 'Beautiful handcrafted jewelry piece'}
                     </p>
                     <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-[#4A7C59]">
+                      <span className="text-2xl font-bold text-[#D4AF37]">
                         ₹{parseFloat(product.price).toLocaleString('en-IN')}
                       </span>
                       {user && (
                         <Button 
                           size="sm" 
-                          className="bg-[#4A7C59] hover:bg-[#3A6047]"
+                          className="bg-[#2D5F3F] hover:bg-[#5E9B76] text-white"
                           onClick={(e) => {
                             e.stopPropagation();
                             alert('Added to cart!');
@@ -296,20 +296,20 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="bg-white mt-12 py-8 border-t">
+      <footer className="bg-[#2D5F3F] mt-12 py-8 border-t-4 border-[#D4AF37]">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#4A7C59] to-[#9BC1A3] rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-[#D4AF37] to-[#B8941F] rounded-full flex items-center justify-center shadow-lg">
               <Star className="w-4 h-4 text-white" fill="white" />
             </div>
-            <h3 className="text-xl font-bold text-[#4A7C59]">SN COLLECTIONS</h3>
+            <h3 className="text-xl font-bold text-[#D4AF37]">SN COLLECTIONS</h3>
           </div>
-          <p className="text-gray-600 mb-2">Premium Jewelry Collection</p>
-          <div className="flex items-center justify-center space-x-2 text-gray-600 mb-4">
+          <p className="text-[#F9E4B7] mb-2 font-medium">Premium Jewelry Collection</p>
+          <div className="flex items-center justify-center space-x-2 text-[#B0D4E8] mb-4">
             <Phone className="w-4 h-4" />
-            <span>8660109399</span>
+            <span className="font-semibold">8660109399</span>
           </div>
-          <p className="text-sm text-gray-500">© 2025 SN COLLECTIONS. All rights reserved.</p>
+          <p className="text-sm text-[#C9B8A0]">© 2025 SN COLLECTIONS. All rights reserved.</p>
         </div>
       </footer>
     </div>

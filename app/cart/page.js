@@ -82,14 +82,14 @@ export default function CartPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#4A7C59] via-[#9BC1A3] to-[#4A7C59] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#2D5F3F] via-[#D4AF37] to-[#2D5F3F] flex items-center justify-center">
         <div className="text-white text-xl">Loading cart...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#4A7C59] via-[#9BC1A3] to-[#4A7C59]">
+    <div className="min-h-screen bg-gradient-to-br from-[#2D5F3F] via-[#D4AF37] to-[#2D5F3F]">
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <Button
@@ -109,7 +109,7 @@ export default function CartPage() {
             <h2 className="text-2xl font-bold mb-2">Your cart is empty</h2>
             <p className="text-gray-600 mb-6">Add some beautiful jewelry to your cart!</p>
             <Button
-              className="bg-[#4A7C59] hover:bg-[#3A6047]"
+              className="bg-[#2D5F3F] hover:bg-[#5E9B76]"
               onClick={() => window.location.href = '/'}
             >
               Browse Products
@@ -130,7 +130,7 @@ export default function CartPage() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#4A7C59] to-[#9BC1A3]">
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2D5F3F] to-[#D4AF37]">
                             <Star className="w-8 h-8 text-white/50" />
                           </div>
                         )}
@@ -139,7 +139,7 @@ export default function CartPage() {
                       <div className="flex-1">
                         <h3 className="font-semibold text-lg mb-1">{item.name}</h3>
                         <p className="text-gray-600 text-sm mb-2">{item.category}</p>
-                        <p className="text-2xl font-bold text-[#4A7C59]">
+                        <p className="text-2xl font-bold text-[#2D5F3F]">
                           ₹{parseFloat(item.price).toLocaleString('en-IN')}
                         </p>
                       </div>
@@ -192,11 +192,11 @@ export default function CartPage() {
                   </div>
                   <div className="border-t pt-3 flex justify-between text-xl font-bold">
                     <span>Total:</span>
-                    <span className="text-[#4A7C59]">₹{(calculateTotal() * 1.05).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                    <span className="text-[#2D5F3F]">₹{(calculateTotal() * 1.05).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                   </div>
                 </div>
                 <Button
-                  className="w-full h-12 bg-[#4A7C59] hover:bg-[#3A6047] text-lg"
+                  className="w-full h-12 bg-[#2D5F3F] hover:bg-[#5E9B76] text-lg"
                   onClick={handleCheckout}
                 >
                   Proceed to Payment

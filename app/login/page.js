@@ -59,16 +59,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#4A7C59] via-[#9BC1A3] to-[#4A7C59] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#2D5F3F] via-[#D4AF37] to-[#2D5F3F] flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-[#4A7C59] to-[#9BC1A3] rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-[#2D5F3F] to-[#D4AF37] rounded-full flex items-center justify-center">
               <Star className="w-8 h-8 text-white" fill="white" />
             </div>
           </div>
           <div>
-            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-[#4A7C59] to-[#3A6047] bg-clip-text text-transparent">
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-[#2D5F3F] to-[#5E9B76] bg-clip-text text-transparent">
               SN COLLECTIONS
             </CardTitle>
             <CardDescription className="mt-2">Welcome back! Please login to continue</CardDescription>
@@ -136,7 +136,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full h-12 bg-[#4A7C59] hover:bg-[#3A6047] text-lg"
+              className="w-full h-12 bg-[#2D5F3F] hover:bg-[#5E9B76] text-lg"
               disabled={loading}
             >
               {loading ? 'Please wait...' : requiresOTP ? 'Verify OTP' : 'Login'}
@@ -148,7 +148,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => window.location.href = '/forgot-password'}
-                  className="text-sm text-[#4A7C59] hover:underline"
+                  className="text-sm text-[#2D5F3F] hover:underline"
                 >
                   Forgot Password?
                 </button>
@@ -157,7 +157,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => window.location.href = '/register'}
-                    className="text-[#4A7C59] font-semibold hover:underline"
+                    className="text-[#2D5F3F] font-semibold hover:underline"
                   >
                     Register here
                   </button>
