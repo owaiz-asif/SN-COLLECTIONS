@@ -145,6 +145,30 @@ export async function GET(request) {
     }
   }
   
+  // GET /api/categories - Get all active categories
+  if (segments[1] === 'categories' && segments.length === 2) {
+    try {
+      const result = await query(
+        'SELECT * FROM categories WHERE is_active = TRUE ORDER BY display_order, name'
+      );
+      return NextResponse.json({ success: true, categories: result.rows });
+    } catch (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+  
+  // GET /api/admin/categories - Get all categories (including inactive)
+  if (segments[1] === 'admin' && segments[2] === 'categories' && segments.length === 3) {
+    try {
+      const result = await query(
+        'SELECT * FROM categories ORDER BY display_order, name'
+      );
+      return NextResponse.json({ success: true, categories: result.rows });
+    } catch (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+  
   // GET /api/cloudinary/signature - Get Cloudinary upload signature
   if (segments[1] === 'cloudinary' && segments[2] === 'signature') {
     try {
@@ -681,6 +705,43 @@ export async function POST(request) {
     }
   }
   
+  // POST /api/admin/categories - Add category
+  if (segments[1] === 'admin' && segments[2] === 'categories' && segments.length === 3) {
+    try {
+      const { name } = body;
+      
+      // Check if category already exists
+      const existing = await query(
+        'SELECT * FROM categories WHERE LOWER(name) = LOWER($1)',
+        [name]
+      );
+      
+      if (existing.rows.length > 0) {
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Category already exists' 
+        }, { status: 400 });
+      }
+      
+      // Get max display order
+      const maxOrder = await query('SELECT MAX(display_order) as max FROM categories');
+      const newOrder = (maxOrder.rows[0].max || 0) + 1;
+      
+      const result = await query(
+        'INSERT INTO categories (name, display_order) VALUES ($1, $2) RETURNING *',
+        [name, newOrder]
+      );
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Category added successfully',
+        category: result.rows[0] 
+      });
+    } catch (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+  
   return NextResponse.json({ error: 'Not found' }, { status: 404 });
 }
 
@@ -769,6 +830,53 @@ export async function PUT(request) {
     }
   }
   
+  // PUT /api/admin/categories/[id] - Update category
+  if (segments[1] === 'admin' && segments[2] === 'categories' && segments.length === 4) {
+    try {
+      const categoryId = segments[3];
+      const { name, is_active } = body;
+      
+      // Check if name is taken by another category
+      if (name) {
+        const existing = await query(
+          'SELECT * FROM categories WHERE LOWER(name) = LOWER($1) AND id != $2',
+          [name, categoryId]
+        );
+        
+        if (existing.rows.length > 0) {
+          return NextResponse.json({ 
+            success: false, 
+            error: 'Category name already exists' 
+          }, { status: 400 });
+        }
+      }
+      
+      let updateQuery = '';
+      let params = [];
+      
+      if (name !== undefined && is_active !== undefined) {
+        updateQuery = 'UPDATE categories SET name = $1, is_active = $2 WHERE id = $3 RETURNING *';
+        params = [name, is_active, categoryId];
+      } else if (name !== undefined) {
+        updateQuery = 'UPDATE categories SET name = $1 WHERE id = $2 RETURNING *';
+        params = [name, categoryId];
+      } else if (is_active !== undefined) {
+        updateQuery = 'UPDATE categories SET is_active = $1 WHERE id = $2 RETURNING *';
+        params = [is_active, categoryId];
+      }
+      
+      const result = await query(updateQuery, params);
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Category updated successfully',
+        category: result.rows[0] 
+      });
+    } catch (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+  
   return NextResponse.json({ error: 'Not found' }, { status: 404 });
 }
 
@@ -802,6 +910,35 @@ export async function DELETE(request) {
       return NextResponse.json({ 
         success: true, 
         message: 'Item removed from cart' 
+      });
+    } catch (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+  
+  // DELETE /api/admin/categories/[id] - Delete category
+  if (segments[1] === 'admin' && segments[2] === 'categories' && segments.length === 4) {
+    try {
+      const categoryId = segments[3];
+      
+      // Check if category is used by any products
+      const productsUsingCategory = await query(
+        'SELECT id FROM products WHERE category = (SELECT name FROM categories WHERE id = $1)',
+        [categoryId]
+      );
+      
+      if (productsUsingCategory.rows.length > 0) {
+        return NextResponse.json({ 
+          success: false, 
+          error: `Cannot delete category. ${productsUsingCategory.rows.length} product(s) are using this category.` 
+        }, { status: 400 });
+      }
+      
+      await query('DELETE FROM categories WHERE id = $1', [categoryId]);
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Category deleted successfully' 
       });
     } catch (error) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });

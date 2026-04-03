@@ -26,6 +26,7 @@ export default function AdminDashboard() {
   const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('products');
   
@@ -34,12 +35,17 @@ export default function AdminDashboard() {
     name: '',
     price: '',
     description: '',
-    category: 'Earrings',
+    category: '',
     images: [] // Array of base64 images
   });
   const [existingImages, setExistingImages] = useState([]); // For edit mode
   const [editingProduct, setEditingProduct] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  
+  // Category form state
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [categoryLoading, setCategoryLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -62,6 +68,7 @@ export default function AdminDashboard() {
     setUser(parsedUser);
     fetchProducts();
     fetchOrders();
+    fetchCategories();
   }, []);
 
   const fetchProducts = async () => {
@@ -87,6 +94,22 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       console.error('Error fetching orders:', error);
+    }
+  };
+  
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/admin/categories');
+      const data = await response.json();
+      if (data.success) {
+        setCategories(data.categories);
+        // Set first category as default if available
+        if (data.categories.length > 0 && !productForm.category) {
+          setProductForm(prev => ({ ...prev, category: data.categories[0].name }));
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
     }
   };
 
@@ -213,6 +236,73 @@ export default function AdminDashboard() {
     localStorage.removeItem('user');
     window.location.href = '/login';
   };
+  
+  const handleAddCategory = async (e) => {
+    e.preventDefault();
+    if (!newCategoryName.trim()) return;
+    
+    setCategoryLoading(true);
+    try {
+      const response = await fetch('/api/admin/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newCategoryName })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        alert('Category added!');
+        setNewCategoryName('');
+        fetchCategories();
+      } else {
+        alert(data.error || 'Failed to add category');
+      }
+    } catch (error) {
+      alert('Error adding category');
+    } finally {
+      setCategoryLoading(false);
+    }
+  };
+  
+  const handleUpdateCategory = async (categoryId, updates) => {
+    try {
+      const response = await fetch(`/api/admin/categories/${categoryId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        alert('Category updated!');
+        fetchCategories();
+      } else {
+        alert(data.error || 'Failed to update category');
+      }
+    } catch (error) {
+      alert('Error updating category');
+    }
+  };
+  
+  const handleDeleteCategory = async (categoryId) => {
+    if (!confirm('Are you sure you want to delete this category?')) return;
+    
+    try {
+      const response = await fetch(`/api/admin/categories/${categoryId}`, {
+        method: 'DELETE'
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        alert('Category deleted!');
+        fetchCategories();
+      } else {
+        alert(data.error || 'Failed to delete category');
+      }
+    } catch (error) {
+      alert('Error deleting category');
+    }
+  };
 
   if (loading) {
     return (
@@ -283,9 +373,10 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="products">Products</TabsTrigger>
             <TabsTrigger value="add-product">Add/Edit Product</TabsTrigger>
+            <TabsTrigger value="categories">Categories</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
           </TabsList>
 
@@ -382,11 +473,11 @@ export default function AdminDashboard() {
                       onValueChange={(value) => setProductForm({ ...productForm, category: value })}
                     >
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        {categories.filter(cat => cat.is_active).map((cat) => (
+                          <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -495,6 +586,116 @@ export default function AdminDashboard() {
                     )}
                   </div>
                 </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Categories Management */}
+          <TabsContent value="categories">
+            <Card className="shadow-2xl">
+              <CardHeader>
+                <CardTitle>Category Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {/* Add New Category */}
+                  <form onSubmit={handleAddCategory} className="flex gap-2">
+                    <Input
+                      placeholder="Enter new category name..."
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      required
+                    />
+                    <Button
+                      type="submit"
+                      className="bg-[#7DAACB] hover:bg-[#6B8CAD]"
+                      disabled={categoryLoading}
+                    >
+                      {categoryLoading ? 'Adding...' : 'Add Category'}
+                    </Button>
+                  </form>
+
+                  {/* Categories List */}
+                  <div className="space-y-2">
+                    <h3 className="font-semibold mb-3">All Categories ({categories.length})</h3>
+                    {categories.length === 0 ? (
+                      <p className="text-gray-500 text-center py-8">No categories yet. Add your first category above.</p>
+                    ) : (
+                      <div className="grid gap-2">
+                        {categories.map((category) => (
+                          <Card key={category.id} className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                {editingCategory === category.id ? (
+                                  <Input
+                                    defaultValue={category.name}
+                                    onBlur={(e) => {
+                                      if (e.target.value !== category.name) {
+                                        handleUpdateCategory(category.id, { name: e.target.value });
+                                      }
+                                      setEditingCategory(null);
+                                    }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                        handleUpdateCategory(category.id, { name: e.target.value });
+                                        setEditingCategory(null);
+                                      }
+                                    }}
+                                    autoFocus
+                                    className="w-64"
+                                  />
+                                ) : (
+                                  <>
+                                    <span className="font-semibold text-lg">{category.name}</span>
+                                    <Badge variant={category.is_active ? "default" : "secondary"}>
+                                      {category.is_active ? 'Active' : 'Inactive'}
+                                    </Badge>
+                                  </>
+                                )}
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                {editingCategory !== category.id && (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => setEditingCategory(category.id)}
+                                    >
+                                      <Edit className="w-4 h-4 mr-1" />
+                                      Rename
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant={category.is_active ? "secondary" : "default"}
+                                      onClick={() => handleUpdateCategory(category.id, { is_active: !category.is_active })}
+                                    >
+                                      {category.is_active ? 'Deactivate' : 'Activate'}
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="destructive"
+                                      onClick={() => handleDeleteCategory(category.id)}
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      <strong>Note:</strong> You cannot delete categories that are being used by products. Deactivated categories won't appear in product selection.
+                    </AlertDescription>
+                  </Alert>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

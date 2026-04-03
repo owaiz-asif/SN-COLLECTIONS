@@ -7,20 +7,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Search, ShoppingCart, User, Phone, Menu, X, Star, Heart } from 'lucide-react';
 
-const categories = [
-  'All Products',
-  'Earrings',
-  'Finger Rings',
-  'Necklace',
-  'Chain',
-  'Anklets',
-  'Rubber Bands',
-  'Clutches'
-];
+const categories = ['All Products']; // Will be populated dynamically
 
 export default function LandingPage() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [dynamicCategories, setDynamicCategories] = useState(['All Products']);
   const [selectedCategory, setSelectedCategory] = useState('All Products');
   const [searchQuery, setSearchQuery] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,12 +24,26 @@ export default function LandingPage() {
     if (token && userData) {
       setUser(JSON.parse(userData));
     }
+    fetchCategories();
     fetchProducts();
   }, []);
 
   useEffect(() => {
     filterProducts();
   }, [selectedCategory, searchQuery, products]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories');
+      const data = await response.json();
+      if (data.success) {
+        const catNames = ['All Products', ...data.categories.map(c => c.name)];
+        setDynamicCategories(catNames);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -205,7 +211,7 @@ export default function LandingPage() {
       <section className="py-8">
         <div className="container mx-auto px-4">
           <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
-            {categories.map((category) => (
+            {dynamicCategories.map((category) => (
               <Button
                 key={category}
                 variant={selectedCategory === category ? "default" : "outline"}
