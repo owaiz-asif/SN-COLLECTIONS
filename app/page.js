@@ -49,7 +49,11 @@ export default function LandingPage() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('/api/products');
+      const userData = localStorage.getItem('user');
+      const parsedUser = userData ? JSON.parse(userData) : null;
+      const qs = parsedUser?.id ? `?userId=${encodeURIComponent(parsedUser.id)}` : '';
+
+      const response = await fetch(`/api/products${qs}`);
       const data = await response.json();
       if (data.success) {
         setProducts(data.products);
@@ -57,6 +61,36 @@ export default function LandingPage() {
       }
     } catch (error) {
       console.error('Error fetching products:', error);
+    }
+  };
+
+  const toggleLike = async (productId) => {
+    const userData = localStorage.getItem('user');
+    const parsedUser = userData ? JSON.parse(userData) : null;
+    if (!parsedUser?.id) {
+      window.location.href = '/login';
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/products/${productId}/like`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: parsedUser.id })
+      });
+      const data = await res.json();
+      if (data.success) {
+        const update = (list) =>
+          list.map((p) =>
+            p.id === productId
+              ? { ...p, like_count: data.likeCount, user_liked: data.liked }
+              : p
+          );
+        setProducts((prev) => update(prev));
+        setFilteredProducts((prev) => update(prev));
+      }
+    } catch (e) {
+      // ignore
     }
   };
 
@@ -287,11 +321,26 @@ export default function LandingPage() {
                         <Star className="w-16 h-16 text-white/50" />
                       </div>
                     )}
-                    <button className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Heart className="w-5 h-5 text-[#B87861]" />
+                    <button
+                      className={`absolute top-3 right-3 rounded-full p-2 shadow-lg transition-opacity ${
+                        product.user_liked ? 'bg-red-50 opacity-100' : 'bg-white opacity-0 group-hover:opacity-100'
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleLike(product.id);
+                      }}
+                      aria-label="Like product"
+                    >
+                      <Heart
+                        className={`w-5 h-5 ${product.user_liked ? 'text-red-500' : 'text-[#B87861]'}`}
+                        fill={product.user_liked ? '#EF4444' : 'none'}
+                      />
                     </button>
                     <Badge className="absolute bottom-3 left-3 bg-[#D4A896] text-white shadow-md">
                       {product.category}
+                    </Badge>
+                    <Badge className="absolute bottom-3 right-3 bg-white/90 text-[#9B6B5F] shadow-md">
+                      ❤ {product.like_count || 0}
                     </Badge>
                   </div>
                   <CardContent className="p-4">

@@ -311,8 +311,15 @@ export default function ProductDetailsPage() {
                 {product.description || 'Beautiful handcrafted jewelry piece from SN Collections'}
               </p>
               <div className="flex items-center gap-3 mb-4">
-                <Button variant="outline" onClick={toggleLike}>
-                  <Heart className={`w-5 h-5 mr-2 ${userLiked ? 'text-red-500' : ''}`} />
+                <Button
+                  variant={userLiked ? "default" : "outline"}
+                  className={userLiked ? "bg-red-500 hover:bg-red-600 text-white border-red-500" : ""}
+                  onClick={toggleLike}
+                >
+                  <Heart
+                    className={`w-5 h-5 mr-2 ${userLiked ? 'text-white' : 'text-[#B87861]'}`}
+                    fill={userLiked ? '#FFFFFF' : 'none'}
+                  />
                   Like ({likeCount})
                 </Button>
                 <Button variant="outline" onClick={handleShare}>

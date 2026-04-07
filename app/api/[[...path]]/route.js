@@ -58,8 +58,21 @@ export async function GET(request) {
   // GET /api/products - Get all products
   if (segments[1] === 'products' && segments.length === 2) {
     try {
+      const userId = searchParams.get('userId');
+
       const result = await query(
-        'SELECT * FROM products ORDER BY created_at DESC'
+        `SELECT 
+           p.*,
+           (SELECT COUNT(*)::int FROM product_likes pl WHERE pl.product_id = p.id) AS like_count,
+           CASE 
+             WHEN $1::uuid IS NULL THEN FALSE
+             ELSE EXISTS (
+               SELECT 1 FROM product_likes pl2 WHERE pl2.product_id = p.id AND pl2.user_id = $1::uuid
+             )
+           END AS user_liked
+         FROM products p
+         ORDER BY p.created_at DESC`,
+        [userId || null]
       );
       return NextResponse.json({ success: true, products: result.rows });
     } catch (error) {
