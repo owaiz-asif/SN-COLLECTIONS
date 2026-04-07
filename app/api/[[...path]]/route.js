@@ -790,6 +790,15 @@ export async function POST(request) {
         return NextResponse.json({ success: false, error: 'Login required' }, { status: 401 });
       }
 
+      // Ensure this is a real customer user (admin ids live in a different table)
+      const userExists = await query('SELECT 1 FROM users WHERE id = $1', [userId]);
+      if (userExists.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: 'Please login with a customer account to like products.' },
+          { status: 400 }
+        );
+      }
+
       const existing = await query(
         'SELECT id FROM product_likes WHERE product_id = $1 AND user_id = $2',
         [productId, userId]
@@ -798,7 +807,14 @@ export async function POST(request) {
       if (existing.rows.length > 0) {
         await query('DELETE FROM product_likes WHERE id = $1', [existing.rows[0].id]);
       } else {
-        await query('INSERT INTO product_likes (product_id, user_id) VALUES ($1, $2)', [productId, userId]);
+        try {
+          await query('INSERT INTO product_likes (product_id, user_id) VALUES ($1, $2)', [productId, userId]);
+        } catch (e) {
+          // If user double-clicks fast, UNIQUE(product_id, user_id) can race. Treat as already-liked.
+          if (e?.code !== '23505') {
+            throw e;
+          }
+        }
       }
 
       const likeCountRes = await query(
