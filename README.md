@@ -196,6 +196,8 @@ created_at TIMESTAMP
 
 ## 📦 Environment Variables
 
+Create a local `.env` file (do **not** commit it). You can copy `.env.example` and fill in the real values.
+
 ```env
 # PostgreSQL
 DATABASE_URL=postgresql://...
