@@ -12,16 +12,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Star, Package, ShoppingBag, Upload, Trash2, Edit, LogOut, AlertCircle } from 'lucide-react';
 
-const categories = [
-  'Earrings',
-  'Finger Rings',
-  'Necklace',
-  'Chain',
-  'Anklets',
-  'Rubber Bands',
-  'Clutches'
-];
-
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
@@ -662,9 +652,13 @@ export default function AdminDashboard() {
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.filter(cat => cat.is_active).map((cat) => (
-                          <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
-                        ))}
+                        {categories
+                          .filter((cat) => cat.is_active !== false)
+                          .map((cat) => (
+                            <SelectItem key={cat.id} value={cat.name}>
+                              {cat.name}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
