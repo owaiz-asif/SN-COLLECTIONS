@@ -27,6 +27,8 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [analytics, setAnalytics] = useState({ total: 0, uniqueSessions: 0, uniqueMembers: 0, logins: 0, users: 0 });
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('products');
   
@@ -36,9 +38,11 @@ export default function AdminDashboard() {
     price: '',
     description: '',
     category: '',
-    images: [] // Array of base64 images
+    images: [], // Array of base64 images
+    videos: [] // Array of base64 videos
   });
   const [existingImages, setExistingImages] = useState([]); // For edit mode
+  const [existingVideos, setExistingVideos] = useState([]); // For edit mode
   const [editingProduct, setEditingProduct] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   
@@ -69,6 +73,8 @@ export default function AdminDashboard() {
     fetchProducts();
     fetchOrders();
     fetchCategories();
+    fetchAnalytics();
+    fetchReviews();
   }, []);
 
   const fetchProducts = async () => {
@@ -110,6 +116,36 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
+    }
+  };
+
+  const fetchAnalytics = async () => {
+    try {
+      const response = await fetch('/api/admin/analytics');
+      const data = await response.json();
+      if (data.success) {
+        setAnalytics({
+          total: data.visits.total,
+          uniqueSessions: data.visits.uniqueSessions,
+          uniqueMembers: data.visits.uniqueMembers,
+          logins: data.logins?.total || 0,
+          users: data.users?.total || 0
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    }
+  };
+
+  const fetchReviews = async () => {
+    try {
+      const response = await fetch('/api/admin/reviews');
+      const data = await response.json();
+      if (data.success) {
+        setReviews(data.reviews || []);
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
     }
   };
 
@@ -159,14 +195,64 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleVideoChange = (e) => {
+    const files = Array.from(e.target.files);
+    const newVideos = [];
+    const maxSize = 50 * 1024 * 1024; // 50MB per file
+
+    let invalidFiles = [];
+    let oversizedFiles = [];
+
+    files.forEach((file) => {
+      if (file.size > maxSize) {
+        oversizedFiles.push(file.name);
+        return;
+      }
+
+      if (!file.type.startsWith('video/')) {
+        invalidFiles.push(file.name);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        newVideos.push(reader.result);
+        if (newVideos.length === files.length - invalidFiles.length - oversizedFiles.length) {
+          setProductForm({ ...productForm, videos: [...productForm.videos, ...newVideos] });
+        }
+      };
+      reader.onerror = () => {
+        alert(`Failed to read file: ${file.name}`);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    if (invalidFiles.length > 0) {
+      alert(`Invalid file type(s): ${invalidFiles.join(', ')}\n\nPlease upload video files only.`);
+    }
+    if (oversizedFiles.length > 0) {
+      alert(`Video file(s) too large (max 50MB): ${oversizedFiles.join(', ')}`);
+    }
+  };
+
   const removeImage = (index) => {
     const newImages = productForm.images.filter((_, i) => i !== index);
     setProductForm({ ...productForm, images: newImages });
   };
 
+  const removeVideo = (index) => {
+    const newVideos = productForm.videos.filter((_, i) => i !== index);
+    setProductForm({ ...productForm, videos: newVideos });
+  };
+
   const removeExistingImage = (index) => {
     const newExisting = existingImages.filter((_, i) => i !== index);
     setExistingImages(newExisting);
+  };
+
+  const removeExistingVideo = (index) => {
+    const newExisting = existingVideos.filter((_, i) => i !== index);
+    setExistingVideos(newExisting);
   };
 
   const handleProductSubmit = async (e) => {
@@ -189,15 +275,18 @@ export default function AdminDashboard() {
           description: productForm.description,
           category: productForm.category,
           images: productForm.images, // Array of base64 images
-          existingImages: editingProduct ? existingImages : []
+          existingImages: editingProduct ? existingImages : [],
+          videos: productForm.videos, // Array of base64 videos
+          existingVideos: editingProduct ? existingVideos : []
         })
       });
 
       const data = await response.json();
       if (data.success) {
         alert(editingProduct ? 'Product updated!' : 'Product added!');
-        setProductForm({ name: '', price: '', description: '', category: 'Earrings', images: [] });
+        setProductForm({ name: '', price: '', description: '', category: 'Earrings', images: [], videos: [] });
         setExistingImages([]);
+        setExistingVideos([]);
         setEditingProduct(null);
         fetchProducts();
       } else {
@@ -229,15 +318,18 @@ export default function AdminDashboard() {
 
   const handleEditProduct = (product) => {
     const productImages = product.images ? (typeof product.images === 'string' ? JSON.parse(product.images) : product.images) : [];
+    const productVideos = product.videos ? (typeof product.videos === 'string' ? JSON.parse(product.videos) : product.videos) : [];
     
     setProductForm({
       name: product.name,
       price: product.price,
       description: product.description,
       category: product.category,
-      images: []
+      images: [],
+      videos: []
     });
     setExistingImages(productImages);
+    setExistingVideos(productVideos);
     setEditingProduct(product);
     setActiveTab('add-product');
   };
@@ -361,7 +453,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card className="shadow-xl">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -397,16 +489,82 @@ export default function AdminDashboard() {
               </div>
             </CardContent>
           </Card>
+          <Card className="shadow-xl">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm">Website Views</p>
+                  <p className="text-3xl font-bold text-[#B87861]">{analytics.uniqueSessions}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Members: {analytics.uniqueMembers} • Logins: {analytics.logins}
+                  </p>
+                </div>
+                <Star className="w-12 h-12 text-[#B87861]/20" />
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-6">
+          <TabsList className="grid w-full grid-cols-5 mb-6">
             <TabsTrigger value="products">Products</TabsTrigger>
             <TabsTrigger value="add-product">Add/Edit Product</TabsTrigger>
+            <TabsTrigger value="reviews">Reviews</TabsTrigger>
             <TabsTrigger value="categories">Categories</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
           </TabsList>
+
+          {/* Reviews */}
+          <TabsContent value="reviews">
+            <Card className="shadow-2xl">
+              <CardHeader>
+                <CardTitle>All Reviews ({reviews.length})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {reviews.length === 0 ? (
+                  <p className="text-gray-600">No reviews yet.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {reviews.map((r) => (
+                      <Card key={r.id} className="p-4">
+                        <div className="flex items-start gap-4">
+                          <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                            {r.product_image ? (
+                              <img
+                                src={r.product_image}
+                                alt={r.product_name || 'Product'}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Star className="w-6 h-6 text-gray-400" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                              <div>
+                                <div className="font-semibold">{r.product_name || 'Product'}</div>
+                                <div className="text-sm text-gray-600">
+                                  By: {r.user_name || 'User'}{r.user_phone ? ` (${r.user_phone})` : ''}
+                                </div>
+                              </div>
+                              <div className="text-sm font-semibold text-[#B87861]">{r.rating}★</div>
+                            </div>
+                            {r.comment && <p className="text-gray-700 mt-2">{r.comment}</p>}
+                            <div className="text-xs text-gray-500 mt-2">
+                              {new Date(r.created_at).toLocaleString('en-IN')}
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Products List */}
           <TabsContent value="products">
@@ -593,6 +751,72 @@ export default function AdminDashboard() {
                     )}
                   </div>
 
+                  <div className="space-y-2">
+                    <Label htmlFor="video">Product Videos (Optional)</Label>
+                    <Input
+                      id="video"
+                      type="file"
+                      accept="video/*"
+                      multiple
+                      onChange={handleVideoChange}
+                    />
+                    <p className="text-sm text-gray-500">You can select multiple videos (max 50MB each)</p>
+
+                    {/* Existing Videos */}
+                    {existingVideos.length > 0 && (
+                      <div className="mt-4">
+                        <Label className="mb-2 block">Current Videos:</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                          {existingVideos.map((v, index) => (
+                            <div key={index} className="relative group">
+                              <video
+                                src={v.url}
+                                controls
+                                className="w-full h-32 object-cover rounded-lg border-2 border-gray-200 bg-black"
+                              />
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="destructive"
+                                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 h-6 w-6"
+                                onClick={() => removeExistingVideo(index)}
+                              >
+                                ✕
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* New Videos Preview */}
+                    {productForm.videos.length > 0 && (
+                      <div className="mt-4">
+                        <Label className="mb-2 block">New Videos to Upload:</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                          {productForm.videos.map((v, index) => (
+                            <div key={index} className="relative group">
+                              <video
+                                src={v}
+                                controls
+                                className="w-full h-32 object-cover rounded-lg border-2 border-green-200 bg-black"
+                              />
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="destructive"
+                                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 h-6 w-6"
+                                onClick={() => removeVideo(index)}
+                              >
+                                ✕
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="flex gap-2">
                     <Button
                       type="submit"
@@ -609,7 +833,8 @@ export default function AdminDashboard() {
                         onClick={() => {
                           setEditingProduct(null);
                           setExistingImages([]);
-                          setProductForm({ name: '', price: '', description: '', category: 'Earrings', images: [] });
+                          setExistingVideos([]);
+                          setProductForm({ name: '', price: '', description: '', category: 'Earrings', images: [], videos: [] });
                         }}
                       >
                         Cancel

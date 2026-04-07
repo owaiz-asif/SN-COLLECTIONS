@@ -71,11 +71,6 @@ A full-stack e-commerce web application for **SN COLLECTIONS**, a luxury jewelry
 
 ## 🔐 Admin Access
 
-**Login Credentials:**
-- Username: `sncollections_official`
-- Password: `nabeel@ERT456789`
-- Email: `sncollections7411@gmail.com`
-
 **Admin Flow:**
 1. Go to Login page
 2. Enter admin credentials
@@ -206,21 +201,21 @@ created_at TIMESTAMP
 DATABASE_URL=postgresql://...
 
 # Cloudinary
-CLOUDINARY_CLOUD_NAME=dtn519lqo
-CLOUDINARY_API_KEY=957237556767749
-CLOUDINARY_API_SECRET=1_0eUFw4Spd-W9k1aIrA5hDBYJM
+CLOUDINARY_CLOUD_NAME=...
+CLOUDINARY_API_KEY=...
+CLOUDINARY_API_SECRET=...
 
 # Email
-MAIL_FROM=sncollections7411@gmail.com
-MAIL_PASSWORD=Zaina@123#
+MAIL_FROM=...
+MAIL_PASSWORD=...
 
 # JWT
-JWT_SECRET=sn_collections_secret_key_2025_secure_jewelry_store
+JWT_SECRET=...
 
 # Admin
-ADMIN_USERNAME=sncollections_official
-ADMIN_PASSWORD=nabeel@ERT456789
-ADMIN_EMAIL=sncollections7411@gmail.com
+ADMIN_USERNAME=...
+ADMIN_PASSWORD=...
+ADMIN_EMAIL=...
 
 # OTP
 OTP_EXPIRY_MINUTES=5

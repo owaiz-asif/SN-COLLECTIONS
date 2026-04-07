@@ -47,6 +47,7 @@ export async function GET(request) {
   await ensureDbInitialized();
   
   const { pathname } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const segments = pathname.split('/').filter(Boolean);
   
   // Root API
@@ -80,6 +81,62 @@ export async function GET(request) {
       }
       
       return NextResponse.json({ success: true, product: result.rows[0] });
+    } catch (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  // GET /api/products/[id]/social - Likes + reviews summary
+  if (segments[1] === 'products' && segments.length === 4 && segments[3] === 'social') {
+    try {
+      const productId = segments[2];
+      const userId = searchParams.get('userId');
+
+      const likeCountRes = await query(
+        'SELECT COUNT(*)::int AS count FROM product_likes WHERE product_id = $1',
+        [productId]
+      );
+
+      const reviewSummaryRes = await query(
+        `SELECT 
+           COUNT(*)::int AS count,
+           COALESCE(ROUND(AVG(rating)::numeric, 1), 0)::float AS average
+         FROM product_reviews
+         WHERE product_id = $1`,
+        [productId]
+      );
+
+      let userLiked = false;
+      if (userId) {
+        const likedRes = await query(
+          'SELECT 1 FROM product_likes WHERE product_id = $1 AND user_id = $2',
+          [productId, userId]
+        );
+        userLiked = likedRes.rows.length > 0;
+      }
+
+      const latestReviewsRes = await query(
+        `SELECT r.id, r.rating, r.comment, r.created_at, u.name as user_name
+         FROM product_reviews r
+         LEFT JOIN users u ON u.id = r.user_id
+         WHERE r.product_id = $1
+         ORDER BY r.created_at DESC
+         LIMIT 20`,
+        [productId]
+      );
+
+      return NextResponse.json({
+        success: true,
+        likes: {
+          count: likeCountRes.rows[0].count,
+          userLiked
+        },
+        reviews: {
+          count: reviewSummaryRes.rows[0].count,
+          average: reviewSummaryRes.rows[0].average,
+          items: latestReviewsRes.rows
+        }
+      });
     } catch (error) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
@@ -175,6 +232,54 @@ export async function GET(request) {
       const timestamp = Math.floor(Date.now() / 1000);
       const signatureData = generateSignature(timestamp);
       return NextResponse.json({ success: true, ...signatureData });
+    } catch (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  // GET /api/admin/analytics - Site views summary
+  if (segments[1] === 'admin' && segments[2] === 'analytics' && segments.length === 3) {
+    try {
+      const totalRes = await query('SELECT COUNT(*)::int AS total FROM site_visits');
+      const uniqueSessionsRes = await query('SELECT COUNT(DISTINCT session_id)::int AS total FROM site_visits');
+      const uniqueMembersRes = await query('SELECT COUNT(DISTINCT user_id)::int AS total FROM site_visits WHERE user_id IS NOT NULL');
+      const loginRes = await query('SELECT COUNT(*)::int AS total FROM login_events');
+      const usersRes = await query('SELECT COUNT(*)::int AS total FROM users');
+
+      return NextResponse.json({
+        success: true,
+        visits: {
+          total: totalRes.rows[0].total,
+          uniqueSessions: uniqueSessionsRes.rows[0].total,
+          uniqueMembers: uniqueMembersRes.rows[0].total
+        },
+        logins: {
+          total: loginRes.rows[0].total
+        },
+        users: {
+          total: usersRes.rows[0].total
+        }
+      });
+    } catch (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  // GET /api/admin/reviews - Latest reviews (admin)
+  if (segments[1] === 'admin' && segments[2] === 'reviews' && segments.length === 3) {
+    try {
+      const result = await query(
+        `SELECT r.id, r.rating, r.comment, r.created_at,
+                u.name as user_name, u.phone as user_phone,
+                p.id as product_id, p.name as product_name, p.image_url as product_image
+         FROM product_reviews r
+         LEFT JOIN users u ON u.id = r.user_id
+         LEFT JOIN products p ON p.id = r.product_id
+         ORDER BY r.created_at DESC
+         LIMIT 200`
+      );
+
+      return NextResponse.json({ success: true, reviews: result.rows });
     } catch (error) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
@@ -337,6 +442,12 @@ export async function POST(request) {
           });
           
           delete admin.password;
+
+          // Track admin login
+          await query(
+            'INSERT INTO login_events (admin_id, kind) VALUES ($1, $2)',
+            [admin.id, 'admin']
+          );
           
           return NextResponse.json({ 
             success: true, 
@@ -375,6 +486,12 @@ export async function POST(request) {
       
       // Remove password from response
       delete user.password;
+
+      // Track user login
+      await query(
+        'INSERT INTO login_events (user_id, kind) VALUES ($1, $2)',
+        [user.id, 'user']
+      );
       
       return NextResponse.json({ 
         success: true, 
@@ -609,7 +726,7 @@ export async function POST(request) {
   // POST /api/admin/products - Add product
   if (segments[1] === 'admin' && segments[2] === 'products') {
     try {
-      const { name, price, description, category, images } = body; // images is array of base64
+      const { name, price, description, category, images, videos } = body; // images/videos are arrays of base64
       
       let imageUrls = [];
       if (images && Array.isArray(images) && images.length > 0) {
@@ -621,13 +738,23 @@ export async function POST(request) {
           }
         }
       }
+
+      let videoUrls = [];
+      if (videos && Array.isArray(videos) && videos.length > 0) {
+        for (const videoBase64 of videos) {
+          if (videoBase64) {
+            const videoUrl = await uploadToCloudinary(videoBase64, 'sn_collections/products');
+            videoUrls.push({ url: videoUrl });
+          }
+        }
+      }
       
       // Also set first image as image_url for backward compatibility
       const primaryImageUrl = imageUrls.length > 0 ? imageUrls[0].url : null;
       
       const result = await query(
-        'INSERT INTO products (name, price, description, category, image_url, images) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-        [name, parseFloat(price), description, category, primaryImageUrl, JSON.stringify(imageUrls)]
+        'INSERT INTO products (name, price, description, category, image_url, images, videos) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+        [name, parseFloat(price), description, category, primaryImageUrl, JSON.stringify(imageUrls), JSON.stringify(videoUrls)]
       );
       
       return NextResponse.json({ 
@@ -635,6 +762,111 @@ export async function POST(request) {
         message: 'Product added successfully',
         product: result.rows[0] 
       });
+    } catch (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  // POST /api/products/[id]/like - Toggle like
+  if (segments[1] === 'products' && segments.length === 4 && segments[3] === 'like') {
+    try {
+      const productId = segments[2];
+      const { userId } = body;
+
+      if (!userId) {
+        return NextResponse.json({ success: false, error: 'Login required' }, { status: 401 });
+      }
+
+      const existing = await query(
+        'SELECT id FROM product_likes WHERE product_id = $1 AND user_id = $2',
+        [productId, userId]
+      );
+
+      if (existing.rows.length > 0) {
+        await query('DELETE FROM product_likes WHERE id = $1', [existing.rows[0].id]);
+      } else {
+        await query('INSERT INTO product_likes (product_id, user_id) VALUES ($1, $2)', [productId, userId]);
+      }
+
+      const likeCountRes = await query(
+        'SELECT COUNT(*)::int AS count FROM product_likes WHERE product_id = $1',
+        [productId]
+      );
+
+      return NextResponse.json({
+        success: true,
+        liked: existing.rows.length === 0,
+        likeCount: likeCountRes.rows[0].count
+      });
+    } catch (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  // POST /api/products/[id]/reviews - Add review
+  if (segments[1] === 'products' && segments.length === 4 && segments[3] === 'reviews') {
+    try {
+      const productId = segments[2];
+      const { userId, rating, comment } = body;
+
+      if (!userId) {
+        return NextResponse.json({ success: false, error: 'Login required' }, { status: 401 });
+      }
+
+      const intRating = parseInt(rating, 10);
+      if (!intRating || intRating < 1 || intRating > 5) {
+        return NextResponse.json({ success: false, error: 'Rating must be 1-5' }, { status: 400 });
+      }
+
+      const safeComment = (comment || '').toString().slice(0, 2000);
+
+      let result;
+      try {
+        result = await query(
+          'INSERT INTO product_reviews (product_id, user_id, rating, comment) VALUES ($1, $2, $3, $4) RETURNING *',
+          [productId, userId, intRating, safeComment]
+        );
+      } catch (e) {
+        // If running against an older DB where comment column doesn't exist, migrate and retry.
+        if (e?.code === '42703' && typeof e?.message === 'string' && e.message.toLowerCase().includes('comment')) {
+          await query('ALTER TABLE product_reviews ADD COLUMN IF NOT EXISTS comment TEXT');
+          result = await query(
+            'INSERT INTO product_reviews (product_id, user_id, rating, comment) VALUES ($1, $2, $3, $4) RETURNING *',
+            [productId, userId, intRating, safeComment]
+          );
+        } else {
+          throw e;
+        }
+      }
+
+      return NextResponse.json({ success: true, review: result.rows[0] });
+    } catch (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  // POST /api/analytics/visit - Record a site visit
+  if (segments[1] === 'analytics' && segments[2] === 'visit' && segments.length === 3) {
+    try {
+      const { sessionId, userId, path } = body;
+      if (!sessionId) {
+        return NextResponse.json({ success: false, error: 'sessionId required' }, { status: 400 });
+      }
+
+      const ip =
+        request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+        request.headers.get('x-real-ip') ||
+        null;
+      const userAgent = request.headers.get('user-agent') || null;
+
+      await query(
+        `INSERT INTO site_visits (session_id, user_id, ip, user_agent, path)
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (session_id, path) DO NOTHING`,
+        [sessionId, userId || null, ip, userAgent, path || '/']
+      );
+
+      return NextResponse.json({ success: true });
     } catch (error) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
@@ -756,9 +988,10 @@ export async function PUT(request) {
   if (segments[1] === 'admin' && segments[2] === 'products' && segments.length === 4) {
     try {
       const productId = segments[3];
-      const { name, price, description, category, images, existingImages } = body;
+      const { name, price, description, category, images, existingImages, videos, existingVideos } = body;
       
       let imageUrls = existingImages || [];
+      let videoUrls = existingVideos || [];
       
       // Upload new images if provided
       if (images && Array.isArray(images) && images.length > 0) {
@@ -769,13 +1002,23 @@ export async function PUT(request) {
           }
         }
       }
+
+      // Upload new videos if provided
+      if (videos && Array.isArray(videos) && videos.length > 0) {
+        for (const videoBase64 of videos) {
+          if (videoBase64) {
+            const videoUrl = await uploadToCloudinary(videoBase64, 'sn_collections/products');
+            videoUrls.push({ url: videoUrl });
+          }
+        }
+      }
       
       // Set first image as primary image_url
       const primaryImageUrl = imageUrls.length > 0 ? imageUrls[0].url : null;
       
       const result = await query(
-        'UPDATE products SET name = $1, price = $2, description = $3, category = $4, image_url = $5, images = $6 WHERE id = $7 RETURNING *',
-        [name, parseFloat(price), description, category, primaryImageUrl, JSON.stringify(imageUrls), productId]
+        'UPDATE products SET name = $1, price = $2, description = $3, category = $4, image_url = $5, images = $6, videos = $7 WHERE id = $8 RETURNING *',
+        [name, parseFloat(price), description, category, primaryImageUrl, JSON.stringify(imageUrls), JSON.stringify(videoUrls), productId]
       );
       
       return NextResponse.json({ 

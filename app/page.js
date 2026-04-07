@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Search, ShoppingCart, User, Phone, Menu, X, Star, Heart } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 
 const categories = ['All Products']; // Will be populated dynamically
 
@@ -26,6 +27,7 @@ export default function LandingPage() {
     }
     fetchCategories();
     fetchProducts();
+    recordVisit();
   }, []);
 
   useEffect(() => {
@@ -80,6 +82,31 @@ export default function LandingPage() {
     localStorage.removeItem('user');
     setUser(null);
     window.location.reload();
+  };
+
+  const recordVisit = async () => {
+    try {
+      let sessionId = localStorage.getItem('sessionId');
+      if (!sessionId) {
+        sessionId = uuidv4();
+        localStorage.setItem('sessionId', sessionId);
+      }
+
+      const userData = localStorage.getItem('user');
+      const parsedUser = userData ? JSON.parse(userData) : null;
+
+      await fetch('/api/analytics/visit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          userId: parsedUser?.id || null,
+          path: '/'
+        })
+      });
+    } catch (error) {
+      // silent fail
+    }
   };
 
   return (
