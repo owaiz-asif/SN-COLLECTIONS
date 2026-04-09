@@ -123,8 +123,7 @@ export default function PaymentPage() {
   }
 
   const subtotal = calculateTotal();
-  const gst = subtotal * 0.05;
-  const finalAmount = subtotal + gst;
+  const finalAmount = subtotal;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#B87861] via-[#9B6B5F] to-[#B87861]">
@@ -212,10 +211,6 @@ export default function PaymentPage() {
                 <div className="flex justify-between text-lg">
                   <span>Subtotal:</span>
                   <span className="font-semibold">₹{subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                </div>
-                <div className="flex justify-between text-lg">
-                  <span>GST (5%):</span>
-                  <span className="font-semibold">₹{gst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                 </div>
                 <div className="border-t pt-2 flex justify-between text-2xl font-bold">
                   <span>Total Amount:</span>

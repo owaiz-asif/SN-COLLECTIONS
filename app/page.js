@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, ShoppingCart, User, Phone, Menu, X, Star, Heart } from 'lucide-react';
+import { Search, ShoppingCart, User, Phone, Menu, X, Star, Heart, Bookmark } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 
 const categories = ['All Products']; // Will be populated dynamically
@@ -33,6 +33,14 @@ export default function LandingPage() {
   useEffect(() => {
     filterProducts();
   }, [selectedCategory, searchQuery, products]);
+
+  // Keep global like counts / wishlist state in sync for everyone
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchProducts();
+    }, 15000);
+    return () => clearInterval(interval);
+  }, []);
 
   const fetchCategories = async () => {
     try {
@@ -91,6 +99,60 @@ export default function LandingPage() {
       }
     } catch (e) {
       // ignore
+    }
+  };
+
+  const toggleWishlist = async (productId) => {
+    const userData = localStorage.getItem('user');
+    const parsedUser = userData ? JSON.parse(userData) : null;
+    if (!parsedUser?.id) {
+      window.location.href = '/login';
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/wishlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: parsedUser.id, productId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        const update = (list) =>
+          list.map((p) =>
+            p.id === productId ? { ...p, user_wishlisted: data.wishlisted } : p
+          );
+        setProducts((prev) => update(prev));
+        setFilteredProducts((prev) => update(prev));
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  const addToCart = async (productId) => {
+    const userData = localStorage.getItem('user');
+    const parsedUser = userData ? JSON.parse(userData) : null;
+    if (!parsedUser?.id) {
+      window.location.href = '/login';
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: parsedUser.id, productId, quantity: 1 })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Added to cart!');
+        window.location.href = '/cart';
+      } else {
+        alert(data.error || 'Failed to add to cart');
+      }
+    } catch {
+      alert('Failed to add to cart');
     }
   };
 
@@ -307,7 +369,11 @@ export default function LandingPage() {
                 <Card 
                   key={product.id} 
                   className="group hover:shadow-2xl transition-all duration-300 cursor-pointer bg-white overflow-hidden"
-                  onClick={() => window.location.href = `/product/${product.id}`}
+                  onClick={(e) => {
+                    // Extra guard for mobile/touch: if a nested control is clicked, don't navigate.
+                    if (e?.target?.closest?.('button')) return;
+                    window.location.href = `/product/${product.id}`;
+                  }}
                 >
                   <div className="relative overflow-hidden bg-gray-100 aspect-square">
                     {product.image_url ? (
@@ -336,6 +402,23 @@ export default function LandingPage() {
                         fill={product.user_liked ? '#EF4444' : 'none'}
                       />
                     </button>
+                    {user && (
+                      <button
+                        className={`absolute top-3 left-3 rounded-full p-2 shadow-lg transition-opacity ${
+                          product.user_wishlisted ? 'bg-[#F5EFE7] opacity-100' : 'bg-white opacity-0 group-hover:opacity-100'
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleWishlist(product.id);
+                        }}
+                        aria-label="Add to wishlist"
+                      >
+                        <Bookmark
+                          className={`w-5 h-5 ${product.user_wishlisted ? 'text-[#B87861]' : 'text-[#9B6B5F]'}`}
+                          fill={product.user_wishlisted ? '#B87861' : 'none'}
+                        />
+                      </button>
+                    )}
                     <Badge className="absolute bottom-3 left-3 bg-[#D4A896] text-white shadow-md">
                       {product.category}
                     </Badge>
@@ -356,9 +439,12 @@ export default function LandingPage() {
                         <Button 
                           size="sm" 
                           className="bg-[#B87861] hover:bg-[#9B6B5F] text-white shadow-md"
+                          onPointerDown={(e) => {
+                            e.stopPropagation();
+                          }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            alert('Added to cart!');
+                            addToCart(product.id);
                           }}
                         >
                           <ShoppingCart className="w-4 h-4 mr-1" />

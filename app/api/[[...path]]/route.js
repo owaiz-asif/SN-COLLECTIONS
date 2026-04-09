@@ -70,6 +70,13 @@ export async function GET(request) {
                SELECT 1 FROM product_likes pl2 WHERE pl2.product_id = p.id AND pl2.user_id = $1::uuid
              )
            END AS user_liked
+           ,
+           CASE
+             WHEN $1::uuid IS NULL THEN FALSE
+             ELSE EXISTS (
+               SELECT 1 FROM wishlist w WHERE w.product_id = p.id AND w.user_id = $1::uuid
+             )
+           END AS user_wishlisted
          FROM products p
          ORDER BY p.created_at DESC`,
         [userId || null]
@@ -181,6 +188,24 @@ export async function GET(request) {
       `, [userId]);
       
       return NextResponse.json({ success: true, cart: result.rows });
+    } catch (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  // GET /api/wishlist/[userId] - Get user wishlist
+  if (segments[1] === 'wishlist' && segments.length === 3) {
+    try {
+      const userId = segments[2];
+      const result = await query(
+        `SELECT w.id, w.created_at, p.id as product_id, p.name, p.price, p.description, p.category, p.image_url
+         FROM wishlist w
+         JOIN products p ON w.product_id = p.id
+         WHERE w.user_id = $1
+         ORDER BY w.created_at DESC`,
+        [userId]
+      );
+      return NextResponse.json({ success: true, wishlist: result.rows });
     } catch (error) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
@@ -905,6 +930,28 @@ export async function POST(request) {
   if (segments[1] === 'cart' && segments.length === 2) {
     try {
       const { userId, productId, quantity } = body;
+
+      if (!userId) {
+        return NextResponse.json({ success: false, error: 'Login required' }, { status: 401 });
+      }
+      if (!productId) {
+        return NextResponse.json({ success: false, error: 'productId required' }, { status: 400 });
+      }
+
+      // Ensure this is a real customer user (admin ids live in a different table)
+      const userExists = await query('SELECT 1 FROM users WHERE id = $1', [userId]);
+      if (userExists.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: 'Please login with a customer account to add to cart.' },
+          { status: 400 }
+        );
+      }
+
+      // Ensure product exists
+      const productExists = await query('SELECT 1 FROM products WHERE id = $1', [productId]);
+      if (productExists.rows.length === 0) {
+        return NextResponse.json({ success: false, error: 'Product not found' }, { status: 404 });
+      }
       
       // Check if item already in cart
       const existing = await query(
@@ -939,14 +986,57 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
   }
+
+  // POST /api/wishlist - Toggle wishlist
+  if (segments[1] === 'wishlist' && segments.length === 2) {
+    try {
+      const { userId, productId } = body;
+
+      if (!userId) {
+        return NextResponse.json({ success: false, error: 'Login required' }, { status: 401 });
+      }
+      if (!productId) {
+        return NextResponse.json({ success: false, error: 'productId required' }, { status: 400 });
+      }
+
+      // Ensure this is a real customer user (admin ids live in a different table)
+      const userExists = await query('SELECT 1 FROM users WHERE id = $1', [userId]);
+      if (userExists.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: 'Please login with a customer account to use wishlist.' },
+          { status: 400 }
+        );
+      }
+
+      const existing = await query(
+        'SELECT id FROM wishlist WHERE user_id = $1 AND product_id = $2',
+        [userId, productId]
+      );
+
+      if (existing.rows.length > 0) {
+        await query('DELETE FROM wishlist WHERE id = $1', [existing.rows[0].id]);
+        return NextResponse.json({ success: true, wishlisted: false });
+      }
+
+      try {
+        await query('INSERT INTO wishlist (user_id, product_id) VALUES ($1, $2)', [userId, productId]);
+      } catch (e) {
+        // Unique(user_id, product_id) can race on double click
+        if (e?.code !== '23505') throw e;
+      }
+
+      return NextResponse.json({ success: true, wishlisted: true });
+    } catch (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
   
   // POST /api/orders - Create order
   if (segments[1] === 'orders' && segments.length === 2) {
     try {
       const { userId, products, totalPrice, transactionId } = body;
-      
-      const gstAmount = totalPrice * 0.05; // 5% GST
-      const finalAmount = totalPrice + gstAmount;
+      const gstAmount = 0;
+      const finalAmount = totalPrice;
       
       const result = await query(
         'INSERT INTO orders (user_id, products, total_price, gst_amount, final_amount, transaction_id, status) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',

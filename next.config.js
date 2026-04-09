@@ -9,6 +9,11 @@ const nextConfig = {
   },
   webpack(config, { dev }) {
     if (dev) {
+      // Windows/AV can intermittently break webpack's filesystem cache (pack.gz),
+      // which leads to runtime crashes like "__webpack_modules__[moduleId] is not a function".
+      // Use in-memory cache for dev stability.
+      config.cache = false;
+
       // Reduce CPU/memory from file watching
       config.watchOptions = {
         poll: 2000, // check every 2 seconds

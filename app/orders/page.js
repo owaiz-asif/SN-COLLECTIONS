@@ -154,10 +154,6 @@ export default function OrdersPage() {
                         <span className="text-gray-600">Subtotal:</span>
                         <span className="font-semibold">₹{parseFloat(order.total_price).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">GST (5%):</span>
-                        <span className="font-semibold">₹{parseFloat(order.gst_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                      </div>
                       <div className="flex justify-between text-xl font-bold pt-2 border-t">
                         <span>Total Amount:</span>
                         <span className="text-[#B87861]">₹{parseFloat(order.final_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>

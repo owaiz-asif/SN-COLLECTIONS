@@ -186,13 +186,9 @@ export default function CartPage() {
                     <span>Subtotal:</span>
                     <span className="font-semibold">₹{calculateTotal().toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                   </div>
-                  <div className="flex justify-between text-lg">
-                    <span>GST (5%):</span>
-                    <span className="font-semibold">₹{(calculateTotal() * 0.05).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                  </div>
                   <div className="border-t pt-3 flex justify-between text-xl font-bold">
                     <span>Total:</span>
-                    <span className="text-[#B87861]">₹{(calculateTotal() * 1.05).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                    <span className="text-[#B87861]">₹{calculateTotal().toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                   </div>
                 </div>
                 <Button

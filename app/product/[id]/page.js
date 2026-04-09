@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Star, ShoppingCart, ArrowLeft, Heart, Minus, Plus, ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
+import { Star, ShoppingCart, ArrowLeft, Heart, Minus, Plus, ChevronLeft, ChevronRight, Share2, Bookmark } from 'lucide-react';
 
 export default function ProductDetailsPage() {
   const params = useParams();
@@ -18,6 +18,7 @@ export default function ProductDetailsPage() {
   const [productVideos, setProductVideos] = useState([]);
   const [likeCount, setLikeCount] = useState(0);
   const [userLiked, setUserLiked] = useState(false);
+  const [userWishlisted, setUserWishlisted] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [reviewSummary, setReviewSummary] = useState({ count: 0, average: 0 });
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
@@ -184,6 +185,28 @@ export default function ProductDetailsPage() {
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
+    }
+  };
+
+  const toggleWishlist = async () => {
+    if (!user) {
+      window.location.href = '/login';
+      return;
+    }
+    try {
+      const res = await fetch('/api/wishlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, productId: product.id })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUserWishlisted(!!data.wishlisted);
+      } else {
+        alert(data.error || 'Failed to update wishlist');
+      }
+    } catch {
+      alert('Failed to update wishlist');
     }
   };
 
@@ -369,9 +392,9 @@ export default function ProductDetailsPage() {
                     Add to Cart
                   </Button>
 
-                  <Button variant="outline" className="w-full h-14">
-                    <Heart className="w-5 h-5 mr-2" />
-                    Add to Wishlist
+                  <Button variant="outline" className="w-full h-14" onClick={toggleWishlist}>
+                    <Bookmark className="w-5 h-5 mr-2" />
+                    {userWishlisted ? 'Wishlisted' : 'Add to Wishlist'}
                   </Button>
                 </div>
               )}
