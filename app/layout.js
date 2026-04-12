@@ -4,7 +4,7 @@ export const metadata = {
   title: "SN Collections",
   description: "Trendy jewelry and accessories",
   verification: {
-    google: "google4df4248576b30e43"
+    google: "RmagooHyEv7H6JRmLIUPTsHQ_eJcxBdplPWYN75u7HU"
   }
 };
 
