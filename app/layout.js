@@ -1,9 +1,12 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'SN COLLECTIONS - Premium Jewelry',
-  description: 'Handcrafted jewelry for every occasion. Discover timeless elegance with SN Collections.',
-}
+  title: "SN Collections",
+  description: "Trendy jewelry and accessories",
+  verification: {
+    google: "google4df4248576b30e43"
+  }
+};
 
 export default function RootLayout({ children }) {
   return (
