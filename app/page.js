@@ -206,7 +206,22 @@ export default function LandingPage() {
   };
 
   return (
+
+
     <div className="min-h-screen bg-gradient-to-br from-[#FAF6F1] via-white to-[#F5EFE7]">
+       <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "SN Collections",
+          url: "https://sn-collections-seven.vercel.app",
+          logo: "https://sn-collections-seven.vercel.app/logo.png"
+        })
+      }}
+    />
+
       <header className="bg-white shadow-lg sticky top-0 z-50 border-b-2 border-[#9B6B5F]">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
