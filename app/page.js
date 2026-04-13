@@ -309,29 +309,43 @@ export default function LandingPage() {
       </header>
 
       <section className="py-12 md:py-20 text-center bg-gradient-to-r from-[#F5EFE7] via-[#FAF6F1] to-[#F5EFE7]">
-        <div className="container mx-auto px-4">
-          <h2 className="text-4xl md:text-6xl font-bold text-[#B87861] mb-4 drop-shadow-md">
-            Discover Timeless Elegance
-          </h2>
-          <p className="text-xl md:text-2xl text-[#9B6B5F] mb-8 font-medium">
-            Handcrafted Jewelry for Every Occasion
-          </p>
-          
-          <div className="max-w-2xl mx-auto bg-white rounded-full shadow-2xl p-2 flex items-center border-2 border-[#B87861]">
-            <Search className="w-5 h-5 ml-3 text-[#C4A18A]" />
-            <Input
-              type="text"
-              placeholder="Search for jewelry..."
-              className="border-0 focus-visible:ring-0 flex-1"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Button className="bg-[#B87861] hover:bg-[#9B6B5F] rounded-full text-white font-semibold shadow-md">
-              Search
-            </Button>
-          </div>
-        </div>
-      </section>
+  <div className="container mx-auto px-4">
+
+    {/* 🔥 MAIN SEO HEADING */}
+    <h1 className="text-4xl md:text-6xl font-bold text-[#B87861] mb-4 drop-shadow-md">
+      SN Collections - Online Jewelry Store in India
+    </h1>
+
+    {/* 🔥 SEO DESCRIPTION */}
+    <p className="text-xl md:text-2xl text-[#9B6B5F] mb-6 font-medium">
+      SN Collections offers trendy necklaces, earrings, and stylish accessories.
+      Discover affordable and elegant jewelry designed for every occasion.
+    </p>
+
+    {/* 🔥 EXTRA CONTENT (this boosts ranking a LOT) */}
+    <p className="text-md text-gray-600 mb-8 max-w-2xl mx-auto">
+      Explore our premium jewelry collection crafted with precision and style.
+      Whether you're looking for daily wear accessories or special occasion pieces,
+      SN Collections brings you the best designs in India.
+    </p>
+
+    {/* 🔍 KEEP YOUR SEARCH BAR */}
+    <div className="max-w-2xl mx-auto bg-white rounded-full shadow-2xl p-2 flex items-center border-2 border-[#B87861]">
+      <Search className="w-5 h-5 ml-3 text-[#C4A18A]" />
+      <Input
+        type="text"
+        placeholder="Search for jewelry..."
+        className="border-0 focus-visible:ring-0 flex-1"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+      <Button className="bg-[#B87861] hover:bg-[#9B6B5F] rounded-full text-white font-semibold shadow-md">
+        Search
+      </Button>
+    </div>
+
+  </div>
+</section>
 
       <section className="py-8 bg-gradient-to-r from-[#F5EFE7] to-[#FAF6F1]">
         <div className="container mx-auto px-4">
